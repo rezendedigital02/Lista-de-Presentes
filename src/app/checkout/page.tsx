@@ -10,13 +10,12 @@ import {
   QrCode,
   Banknote,
   Shield,
-  CheckCircle,
-  Copy,
+  Loader2,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
-import { Button, Card, CardContent, Input } from "@/components/ui";
+import { Button, Card, CardContent } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
-import { weddingData } from "@/types";
 
 interface CheckoutData {
   gift_id: string;
@@ -28,127 +27,69 @@ interface CheckoutData {
   message?: string;
 }
 
-type PaymentMethod = "pix" | "credit_card" | "boleto";
-
-const paymentMethods = [
-  {
-    id: "pix" as PaymentMethod,
-    name: "PIX",
-    icon: QrCode,
-    description: "Aprovação instantânea",
-    recommended: true,
-  },
-  {
-    id: "credit_card" as PaymentMethod,
-    name: "Cartão de Crédito",
-    icon: CreditCard,
-    description: "Parcelamento em até 12x",
-    recommended: false,
-  },
-  {
-    id: "boleto" as PaymentMethod,
-    name: "Boleto Bancário",
-    icon: Banknote,
-    description: "Vencimento em 3 dias",
-    recommended: false,
-  },
-];
-
 export default function CheckoutPage() {
   const router = useRouter();
   const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("pix");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showPixCode, setShowPixCode] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get checkout data from sessionStorage
     const stored = sessionStorage.getItem("checkoutData");
     if (stored) {
       setCheckoutData(JSON.parse(stored));
     } else {
-      // Redirect to gifts page if no checkout data
       router.push("/presentes");
     }
   }, [router]);
-
-  const handleCopyPixKey = () => {
-    navigator.clipboard.writeText(weddingData.pixKey);
-    toast.success("Chave PIX copiada!");
-  };
 
   const handleProcessPayment = async () => {
     if (!checkoutData) return;
 
     setIsProcessing(true);
+    setError(null);
 
     try {
-      // Call API to create payment preference
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...checkoutData,
-          payment_method: selectedMethod,
-        }),
+        body: JSON.stringify(checkoutData),
       });
 
       const data = await response.json();
 
+      console.log("Checkout response:", data);
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erro ao processar pagamento");
+      }
+
       if (data.success && data.init_point) {
-        // Redirect to Mercado Pago checkout
+        // Redirect to Mercado Pago Checkout Pro
+        toast.success("Redirecionando para o Mercado Pago...");
         window.location.href = data.init_point;
-      } else if (selectedMethod === "pix") {
-        // For demo: show PIX code
-        setShowPixCode(true);
-        toast.success("QR Code PIX gerado com sucesso!");
+      } else if (data.demo) {
+        // Demo mode - show message
+        toast.error("Mercado Pago não configurado. Configure as credenciais.");
+        setError("O Mercado Pago não está configurado. Adicione as variáveis de ambiente MERCADOPAGO_ACCESS_TOKEN e NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY.");
       } else {
-        // For demo: redirect to confirmation
-        sessionStorage.setItem(
-          "paymentResult",
-          JSON.stringify({
-            status: "pending",
-            method: selectedMethod,
-            ...checkoutData,
-          })
-        );
-        router.push("/confirmacao?status=pending");
+        throw new Error("Não foi possível gerar o link de pagamento");
       }
-    } catch (error) {
-      console.error("Payment error:", error);
-      // For demo: show PIX fallback
-      if (selectedMethod === "pix") {
-        setShowPixCode(true);
-        toast.success("Use a chave PIX abaixo para realizar o pagamento");
-      } else {
-        toast.error(
-          "Erro ao processar pagamento. Por favor, use o PIX como alternativa."
-        );
-        setSelectedMethod("pix");
-      }
+    } catch (err) {
+      console.error("Payment error:", err);
+      const message = err instanceof Error ? err.message : "Erro ao processar pagamento";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleConfirmPixPayment = () => {
-    sessionStorage.setItem(
-      "paymentResult",
-      JSON.stringify({
-        status: "approved",
-        method: "pix",
-        ...checkoutData,
-      })
-    );
-    router.push("/confirmacao?status=approved");
-  };
-
   if (!checkoutData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-text-muted">Carregando...</div>
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -203,6 +144,9 @@ export default function CheckoutPage() {
                       <p className="text-text-muted text-sm">
                         Contribuição de {checkoutData.guest_name}
                       </p>
+                      <p className="text-text-muted text-sm">
+                        {checkoutData.guest_email}
+                      </p>
                     </div>
                   </div>
 
@@ -243,145 +187,75 @@ export default function CheckoutPage() {
               </div>
             </motion.div>
 
-            {/* Payment Methods */}
+            {/* Payment Section */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {!showPixCode ? (
-                <>
-                  <h2 className="font-serif text-2xl font-bold mb-6">
-                    Forma de Pagamento
-                  </h2>
+              <h2 className="font-serif text-2xl font-bold mb-6">
+                Formas de Pagamento
+              </h2>
 
-                  <div className="space-y-3 mb-6">
-                    {paymentMethods.map((method) => {
-                      const Icon = method.icon;
-                      const isSelected = selectedMethod === method.id;
-
-                      return (
-                        <button
-                          key={method.id}
-                          onClick={() => setSelectedMethod(method.id)}
-                          className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${
-                            isSelected
-                              ? "border-primary bg-primary/5"
-                              : "border-accent hover:border-primary/50"
-                          }`}
-                        >
-                          <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                              isSelected ? "bg-primary" : "bg-accent"
-                            }`}
-                          >
-                            <Icon
-                              className={`w-6 h-6 ${
-                                isSelected ? "text-white" : "text-text"
-                              }`}
-                            />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold">{method.name}</span>
-                              {method.recommended && (
-                                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                                  Recomendado
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm text-text-muted">
-                              {method.description}
-                            </p>
-                          </div>
-                          <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                              isSelected
-                                ? "border-primary bg-primary"
-                                : "border-accent"
-                            }`}
-                          >
-                            {isSelected && (
-                              <CheckCircle className="w-4 h-4 text-white" />
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <Button
-                    onClick={handleProcessPayment}
-                    isLoading={isProcessing}
-                    size="lg"
-                    className="w-full"
-                  >
-                    Pagar {formatCurrency(checkoutData.amount)}
-                  </Button>
-                </>
-              ) : (
-                /* PIX Payment View */
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                      <QrCode className="w-8 h-8 text-green-600" />
-                    </div>
-                    <h2 className="font-serif text-2xl font-bold mb-2">
-                      Pague via PIX
-                    </h2>
-                    <p className="text-text-muted">
-                      Use sua chave PIX ou escaneie o QR Code
-                    </p>
-                  </div>
-
-                  <Card className="bg-accent/30">
-                    <CardContent className="text-center space-y-4">
-                      {/* QR Code Placeholder */}
-                      <div className="w-48 h-48 mx-auto bg-white rounded-lg flex items-center justify-center border-2 border-dashed border-accent">
-                        <QrCode className="w-24 h-24 text-text-muted" />
-                      </div>
-
-                      <div className="text-sm text-text-muted">
-                        ou copie a chave PIX abaixo
-                      </div>
-
-                      {/* PIX Key */}
-                      <div className="flex items-center gap-2 bg-white rounded-lg p-3">
-                        <Input
-                          value={weddingData.pixKey}
-                          readOnly
-                          className="text-center font-mono"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleCopyPixKey}
-                          leftIcon={<Copy className="w-4 h-4" />}
-                        >
-                          Copiar
-                        </Button>
-                      </div>
-
-                      <div className="text-lg font-bold text-primary">
-                        Valor: {formatCurrency(checkoutData.amount)}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Button
-                    onClick={handleConfirmPixPayment}
-                    size="lg"
-                    className="w-full"
-                    leftIcon={<CheckCircle className="w-5 h-5" />}
-                  >
-                    Já fiz o pagamento
-                  </Button>
-
-                  <p className="text-sm text-text-muted text-center">
-                    Após o pagamento, você receberá uma confirmação por email
+              {/* Payment Methods Info */}
+              <Card className="mb-6">
+                <CardContent>
+                  <p className="text-text-muted text-sm mb-4">
+                    Ao clicar em &quot;Pagar&quot;, você será redirecionado para o Mercado Pago onde poderá escolher:
                   </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <QrCode className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">PIX</p>
+                        <p className="text-sm text-text-muted">Aprovação instantânea</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <CreditCard className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Cartão de Crédito</p>
+                        <p className="text-sm text-text-muted">Parcelamento em até 12x</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                        <Banknote className="w-5 h-5 text-orange-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Boleto Bancário</p>
+                        <p className="text-sm text-text-muted">Vencimento em 3 dias úteis</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Error Message */}
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-sm">{error}</p>
                 </div>
               )}
+
+              {/* Pay Button */}
+              <Button
+                onClick={handleProcessPayment}
+                isLoading={isProcessing}
+                size="lg"
+                className="w-full"
+                rightIcon={!isProcessing ? <ExternalLink className="w-5 h-5" /> : undefined}
+              >
+                {isProcessing ? "Processando..." : `Pagar ${formatCurrency(checkoutData.amount)}`}
+              </Button>
+
+              <p className="mt-4 text-sm text-text-muted text-center">
+                Você será redirecionado para o ambiente seguro do Mercado Pago
+              </p>
             </motion.div>
           </div>
         </div>
