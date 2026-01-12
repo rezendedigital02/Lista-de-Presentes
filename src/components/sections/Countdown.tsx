@@ -23,13 +23,13 @@ export function Countdown({ targetDate }: CountdownProps) {
 
   if (!mounted) {
     return (
-      <div className="flex justify-center gap-4 md:gap-8 py-6">
+      <div className="flex justify-center gap-2 sm:gap-4 md:gap-8 py-4 sm:py-6">
         {["Dias", "Horas", "Min", "Seg"].map((label) => (
           <div key={label} className="text-center">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 md:p-6 min-w-[70px] md:min-w-[90px]">
-              <span className="text-3xl md:text-5xl font-bold">--</span>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 sm:p-4 md:p-6 min-w-[55px] sm:min-w-[70px] md:min-w-[90px]">
+              <span className="text-2xl sm:text-3xl md:text-5xl font-bold">--</span>
             </div>
-            <span className="text-sm md:text-base text-white/70 mt-2 block">
+            <span className="text-xs sm:text-sm md:text-base text-white/70 mt-1 sm:mt-2 block">
               {label}
             </span>
           </div>
@@ -46,7 +46,7 @@ export function Countdown({ targetDate }: CountdownProps) {
   ];
 
   return (
-    <div className="flex justify-center gap-4 md:gap-8 py-6">
+    <div className="flex justify-center gap-2 sm:gap-4 md:gap-8 py-4 sm:py-6">
       {timeUnits.map((unit, index) => (
         <motion.div
           key={unit.label}
@@ -60,13 +60,13 @@ export function Countdown({ targetDate }: CountdownProps) {
             initial={{ rotateX: -90 }}
             animate={{ rotateX: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-white/10 backdrop-blur-sm rounded-lg p-4 md:p-6 min-w-[70px] md:min-w-[90px] border border-white/20"
+            className="bg-white/10 backdrop-blur-sm rounded-lg p-2 sm:p-4 md:p-6 min-w-[55px] sm:min-w-[70px] md:min-w-[90px] border border-white/20"
           >
-            <span className="text-3xl md:text-5xl font-bold text-white">
+            <span className="text-2xl sm:text-3xl md:text-5xl font-bold text-white">
               {String(unit.value).padStart(2, "0")}
             </span>
           </motion.div>
-          <span className="text-sm md:text-base text-white/70 mt-2 block font-medium">
+          <span className="text-xs sm:text-sm md:text-base text-white/70 mt-1 sm:mt-2 block font-medium">
             {unit.label}
           </span>
         </motion.div>
