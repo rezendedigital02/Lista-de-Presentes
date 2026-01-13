@@ -87,10 +87,130 @@ export const initialGifts: Gift[] = [
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
-
-  // Quarto
   {
     id: "8",
+    name: "Processador de Alimentos",
+    description:
+      "Solução completa para a cozinha.",
+    price: 199,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.56.54.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41Ni41NC5qcGVnIiwiaWF0IjoxNzY4MjY4Mzg5LCJleHAiOjE3OTk4MDQzODl9.9SQ8CSQobOQtVur-khDsetdS757MnKglugjdTDczHHI",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+   {
+    id: "9",
+    name: "Frigideira para Ovos",
+    description:
+      "Para preparar aquele pós treino de corrido do maridão.",
+    price: 65,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2022.40.36.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMi40MC4zNi5qcGVnIiwiaWF0IjoxNzY4MjY4ODczLCJleHAiOjE3OTk4MDQ4NzN9.zcdDHqXjXysvaR2Y3bouqlAVI26hfTkV2bt4SqZytX4",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "10",
+    name: "Pratos de Sobremesa",
+    description:
+      "Para servir você quando for nos visitar.",
+    price: 40,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2022.39.50.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMi4zOS41MC5qcGVnIiwiaWF0IjoxNzY4MjY5MDM4LCJleHAiOjE3OTk4MDUwMzh9.XZIXpugP7ZBY-xfNtUllmuUuKI05TJJwzob8OlHLkWI",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "11",
+    name: "Sanduicheira",
+    description:
+      "Para fazer aquele misto quente bolado para a esposa.",
+    price: 65,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2022.38.51.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMi4zOC41MS5qcGVnIiwiaWF0IjoxNzY4MjY5MTIxLCJleHAiOjE3OTk4MDUxMjF9.z5ALhhzvYmF_FYi3UJOPyp1htl8AMo9YWIXlLNAqksY",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "12",
+    name: "Conjunto de Pirex",
+    description:
+      "Solução perfeita para quem busca praticidade e qualidade na cozinha.",
+    price: 69,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2022.36.29.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMi4zNi4yOS5qcGVnIiwiaWF0IjoxNzY4MjY5MTU2LCJleHAiOjE3OTk4MDUxNTZ9.ioi6Uov2vezDXS7k5QfVxnkfqE_2LV10vqavvEoLFHA",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "13",
+    name: "Jogo de Copos",
+    description:
+      "Para tomar uma agua, um refri, quem sabe até uma cerveja.",
+    price: 50,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/conjunto-6-copos-altos-de-cristal-lines-380ml-wolff-1.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vY29uanVudG8tNi1jb3Bvcy1hbHRvcy1kZS1jcmlzdGFsLWxpbmVzLTM4MG1sLXdvbGZmLTEud2VicCIsImlhdCI6MTc2ODI2OTI4MiwiZXhwIjoxNzk5ODA1MjgyfQ.sTDTcbNbFYhiQ9G8hUiA4dBEu0_s_gEhkLOLn-xuBNQ",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "14",
+    name: "Potes de Vidro",
+    description:
+      "Para armazenar melhor o alimento.",
+    price: 109,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/61JoryDY+eL.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vNjFKb3J5RFkrZUwuanBnIiwiaWF0IjoxNzY4MjY5Mzk0LCJleHAiOjE3OTk4MDUzOTR9.7inHLkw_ZMvjbRbYg47xexiMVCmrkRk9AYcTngHVE5k",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "15",
+    name: "Assadeira",
+    description:
+      "Para preparar aquele bolo, aquela lasanha.",
+    price: 65,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/51V8Pg5O2XL._AC_SX679_.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vNTFWOFBnNU8yWEwuX0FDX1NYNjc5Xy5qcGciLCJpYXQiOjE3NjgyNjk1MjEsImV4cCI6MTc5OTgwNTUyMX0.mzL6OPOMuJXuCxpOUTlAJbq3rF6GMckF7wSuU6dnj4o",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "16",
+    name: "Batedeira",
+    description:
+      "Para preparar aquele pão fresco, aquele bolo de cenoura.",
+    price: 249,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.58.28.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41OC4yOC5qcGVnIiwiaWF0IjoxNzY4MjY5NTgyLCJleHAiOjE3OTk4MDU1ODJ9.NDKZyrwBYxlMmkysOBkD-k4WB6Cp4-f0ecCg2WJBFWU",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "17",
+    name: "Microondas",
+    description:
+      "Emanuel não gosta, mas eu amo!!!",
+    price: 549,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.55.20.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41NS4yMC5qcGVnIiwiaWF0IjoxNzY4MjY5NjUwLCJleHAiOjE3OTk4MDU2NTB9.ercCsnfB-u9UgR5VLXAF7Uk-FqS87FYu-nOokUFIFM8",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  
+  // Quarto
+  {
+    id: "18",
     name: "Jogo de Cama King 700 Fios",
     description:
       "Jogo de cama king size em algodão egípcio 700 fios, conforto e elegância.",
@@ -102,7 +222,7 @@ export const initialGifts: Gift[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "9",
+    id: "19",
     name: "Edredom King Toque de Pluma",
     description:
       "Edredom king size com enchimento de fibra siliconada, quente e macio.",
@@ -114,7 +234,7 @@ export const initialGifts: Gift[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "10",
+    id: "20",
     name: "Par de Travesseiros NASA",
     description:
       "Travesseiros com tecnologia NASA, viscoelástico que se adapta ao corpo.",
@@ -126,62 +246,110 @@ export const initialGifts: Gift[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "11",
-    name: "Luminária de Mesa Design",
+    id: "21",
+    name: "Cômoda",
     description:
-      "Luminária de mesa com design moderno, luz ajustável e base elegante.",
-    price: 320,
-    image_url: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=500&h=500&fit=crop",
+      "Essencial para organização",
+    price: 425,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/304147-2.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vMzA0MTQ3LTIud2VicCIsImlhdCI6MTc2ODI3MDQ3NSwiZXhwIjoxNzk5ODA2NDc1fQ.ZHspN1VVvwmdFgc5tIcZToc89rDagb0F6-P4trbv8UI",
     category: "quarto" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
-
+  {
+    id: "22",
+    name: "Guarda Roupas",
+    description:
+      "Priscila precisa de dois, mas sempre diz que tem pouca roupa.",
+    price: 1499,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.47.48.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS40Ny40OC5qcGVnIiwiaWF0IjoxNzY4MjcwNTk5LCJleHAiOjE3OTk4MDY1OTl9.8P9RfXSHlbTMDRvVhCBDzUfI_vmD8Glfo8UCm8Jl1mc",
+    category: "quarto" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "23",
+    name: "Cama King",
+    description:
+      "Nossas noites mais tranquilas",
+    price: 2499,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/61sHvWg9UnL._AC_UF894,1000_QL80_.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vNjFzSHZXZzlVbkwuX0FDX1VGODk0LDEwMDBfUUw4MF8uanBnIiwiaWF0IjoxNzY4MjcwNzM3LCJleHAiOjE3OTk4MDY3Mzd9.8Tbk37fodSUkfd-_mpCyDbd4XtvK2r8cvDyjhIVXHzg",
+    category: "quarto" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "24",
+    name: "Ar Condicionado",
+    description:
+      "Emanuel transpira demais, por favor me ajude!",
+    price: 3099,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.44.47.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS40NC40Ny5qcGVnIiwiaWF0IjoxNzY4MjcwODUzLCJleHAiOjE3OTk4MDY4NTN9.HtX1W5KEkJ86Mr-Y-w7sqnNkCrCb5oIZkqhZmuc9NfE",
+    category: "quarto" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  
   // Sala
   {
-    id: "12",
+    id: "25",
     name: "Aparelho de Jantar 42 Peças",
     description:
       "Aparelho de jantar completo em porcelana com detalhes em dourado.",
     price: 900,
-    image_url: "https://images.unsplash.com/photo-1595908129746-57ca1a63dd4d?w=500&h=500&fit=crop",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.52.14.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41Mi4xNC5qcGVnIiwiaWF0IjoxNzY4MjY4Njc4LCJleHAiOjE3OTk4MDQ2Nzh9.9WRy3bbPpKUlvo0WrZvUUqbMxUdcvuF_CBlUvGmKIN0",
     category: "sala" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
   {
-    id: "13",
-    name: "Jogo de Taças de Cristal",
-    description:
-      "Conjunto de 12 taças de cristal para vinho e champagne, elegância à mesa.",
-    price: 380,
-    image_url: "https://images.unsplash.com/photo-1516594915697-87eb3b1c14ea?w=500&h=500&fit=crop",
-    category: "sala" as Category,
-    is_available: true,
-    amount_received: 0,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "14",
+    id: "26",
     name: "Kit Almofadas Decorativas",
     description:
       "Conjunto de 4 almofadas decorativas em veludo, cores neutras e elegantes.",
     price: 180,
-    image_url: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=500&fit=crop",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/61CJbQolcHL._AC_UF894,1000_QL80_.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vNjFDSmJRb2xjSEwuX0FDX1VGODk0LDEwMDBfUUw4MF8uanBnIiwiaWF0IjoxNzY4MjcwOTc0LCJleHAiOjE3OTk4MDY5NzR9.976E4PrFG9nkQhozwjCehbpoVVES78-pHi5MYxih5Sc",
     category: "sala" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
   {
-    id: "15",
+    id: "27",
     name: "Quadro Decorativo Grande",
     description:
       "Quadro decorativo em canvas 80x60cm, arte abstrata moderna.",
     price: 350,
-    image_url: "https://images.unsplash.com/photo-1549887534-1541e9326642?w=500&h=500&fit=crop",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/quadro_decorativo_paisagem_grande_arvore_da_vida_com_moldura_1567584310_2cc2_600x600.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vcXVhZHJvX2RlY29yYXRpdm9fcGFpc2FnZW1fZ3JhbmRlX2Fydm9yZV9kYV92aWRhX2NvbV9tb2xkdXJhXzE1Njc1ODQzMTBfMmNjMl82MDB4NjAwLmpwZyIsImlhdCI6MTc2ODI3MTA1MywiZXhwIjoxNzk5ODA3MDUzfQ.LJ5nYVPM142EExBwNOVtU7X4KP400nAmWXmaZy2deLs",
+    category: "sala" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "28",
+    name: "Sofá Para Reunir Toda Família",
+    description:
+      "Para relaxar com tranquilidade, bater aquele bom papo.",
+    price: 1599,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.45.28.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS40NS4yOC5qcGVnIiwiaWF0IjoxNzY4MjcxMTU2LCJleHAiOjE3OTk4MDcxNTZ9.tUNCt8E3DvhosWXhvt76OLTlPSlpC2OfTzxHCNWy7-4",
+    category: "sala" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "29",
+    name: "Tapete Central",
+    description:
+      "Para acumular sujeira e ser difícil de limpar.",
+    price: 65,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.59.56.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41OS41Ni5qcGVnIiwiaWF0IjoxNzY4MjcxMjU0LCJleHAiOjE3OTk4MDcyNTR9.srZ-ND2PNN7N3rgjfw1zlQB1nZ6a80Qk5SZ53xblRdY",
     category: "sala" as Category,
     is_available: true,
     amount_received: 0,
@@ -190,36 +358,36 @@ export const initialGifts: Gift[] = [
 
   // Banheiro
   {
-    id: "16",
+    id: "30",
     name: "Jogo de Toalhas Egípcias",
     description:
       "Conjunto de 8 toalhas em algodão egípcio 500g/m², macias e absorventes.",
-    price: 320,
-    image_url: "https://images.unsplash.com/photo-1600369671236-e74521d4b6ad?w=500&h=500&fit=crop",
+    price: 150,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/jogo-de-banho-padua-tecido-egipcio-100-algodao-05-pecas-concreto-62fb7cf1b3c07-medium.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vam9nby1kZS1iYW5oby1wYWR1YS10ZWNpZG8tZWdpcGNpby0xMDAtYWxnb2Rhby0wNS1wZWNhcy1jb25jcmV0by02MmZiN2NmMWIzYzA3LW1lZGl1bS5qcGciLCJpYXQiOjE3NjgyNzEzODgsImV4cCI6MTc5OTgwNzM4OH0.T8i6Gz8Fz309dVFIzZoL8_NmpDXg90sdCuhRMq1pahY",
     category: "banheiro" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
   {
-    id: "17",
-    name: "Par de Roupões de Banho",
-    description:
-      "Roupões de banho felpudos tamanho G/GG, conforto após o banho.",
-    price: 220,
-    image_url: "https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?w=500&h=500&fit=crop",
-    category: "banheiro" as Category,
-    is_available: true,
-    amount_received: 0,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "18",
+    id: "31",
     name: "Kit Organizadores de Banheiro",
     description:
       "Conjunto de organizadores em bamboo para banheiro, prático e elegante.",
-    price: 150,
-    image_url: "https://images.unsplash.com/photo-1585412459212-d8b544cd8e4d?w=500&h=500&fit=crop",
+    price: 99,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/81NN7Vi6SoL.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vODFOTjdWaTZTb0wuanBnIiwiaWF0IjoxNzY4MjcxNDY4LCJleHAiOjE3OTk4MDc0Njh9.9sOKyh7Tzfn83O_TLPe-RT9WrL9yUYhaSofj_Qkl-U8",
+    category: "banheiro" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "32",
+    name: "Espelho Redondo",
+    description:
+      "Espelho, espelho meu.",
+    price: 199,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.54.52.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41NC41Mi5qcGVnIiwiaWF0IjoxNzY4MjcxNTk4LCJleHAiOjE3OTk4MDc1OTh9.fMaOuGsrk2Dgb2oBFMR8a7NTqhTu367Dl4u84-kR0m8",
     category: "banheiro" as Category,
     is_available: true,
     amount_received: 0,
@@ -228,48 +396,48 @@ export const initialGifts: Gift[] = [
 
   // Eletrodomésticos
   {
-    id: "19",
-    name: "Aspirador Robô Xiaomi",
+    id: "33",
+    name: "Aspirador Robô",
     description:
       "Robô aspirador com mapeamento inteligente, conectividade WiFi e app.",
-    price: 2200,
-    image_url: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=500&fit=crop",
+    price: 1399,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.47.08.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS40Ny4wOC5qcGVnIiwiaWF0IjoxNzY4MjY5OTg1LCJleHAiOjE3OTk4MDU5ODV9.eUTHttklp-5z0k2ZlnpPaKXzt-rAObvc5kYWdEhropQ",
     category: "eletrodomesticos" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
   {
-    id: "20",
-    name: "Microondas Brastemp 32L",
+    id: "34",
+    name: "Microondas",
     description:
-      "Microondas 32 litros com funções grill e receitas pré-programadas.",
-    price: 750,
-    image_url: "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=500&h=500&fit=crop",
-    category: "eletrodomesticos" as Category,
+      "Emanuel não gosta, mas eu amo!!!",
+    price: 549,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.55.20.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41NS4yMC5qcGVnIiwiaWF0IjoxNzY4MjY5NjUwLCJleHAiOjE3OTk4MDU2NTB9.ercCsnfB-u9UgR5VLXAF7Uk-FqS87FYu-nOokUFIFM8",
+    category: "cozinha" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
   {
-    id: "21",
-    name: "Lavadora de Roupas 12kg",
+    id: "35",
+    name: "Lavadora de Roupas",
     description:
-      "Máquina de lavar 12kg com lavagem automática e centrifugação potente.",
-    price: 3200,
-    image_url: "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=500&h=500&fit=crop",
+      "Máquina de lavar 14kg com lavagem automática e centrifugação potente.",
+    price: 3500,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/41A77aK8yaL.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vNDFBNzdhSzh5YUwuanBnIiwiaWF0IjoxNzY4MjY5OTE0LCJleHAiOjE3OTk4MDU5MTR9.XnPcGUKUucljEz6wB1KvxiuHuXxZlvhhVyKfwtL3VTI",
     category: "eletrodomesticos" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
   {
-    id: "22",
+    id: "36",
     name: "Geladeira Frost Free 400L",
     description:
       "Geladeira duplex frost free, design moderno e economia de energia.",
     price: 4500,
-    image_url: "https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=500&h=500&fit=crop",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.40.42.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS40MC40Mi5qcGVnIiwiaWF0IjoxNzY4MjY5NzgwLCJleHAiOjE3OTk4MDU3ODB9.7M4CQtdY_S-8QP_ZzYzo09Py35S7GaVD51NnUIKFPdc",
     category: "eletrodomesticos" as Category,
     is_available: true,
     amount_received: 0,
@@ -278,39 +446,28 @@ export const initialGifts: Gift[] = [
 
   // Experiências
   {
-    id: "23",
+    id: "37",
     name: "Lua de Mel dos Sonhos",
     description:
       "Contribua para a nossa lua de mel! Qualquer valor ajuda a realizar nosso sonho.",
     price: 10000,
-    image_url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500&h=500&fit=crop",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/44f1b87df61dfaecb4141a236286342c44bff37d.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vNDRmMWI4N2RmNjFkZmFlY2I0MTQxYTIzNjI4NjM0MmM0NGJmZjM3ZC53ZWJwIiwiaWF0IjoxNzY4MjcwMDg0LCJleHAiOjE3OTk4MDYwODR9.OSyKN26UnE0RY_8WctzoM7nnPSBXDLh2ffgr7-aT8RM",
     category: "experiencias" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
   {
-    id: "24",
+    id: "38",
     name: "Jantar Romântico",
     description:
       "Experiência gastronômica em restaurante premiado para celebrar nosso amor.",
     price: 500,
-    image_url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=500&fit=crop",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/marakuthai.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vbWFyYWt1dGhhaS53ZWJwIiwiaWF0IjoxNzY4MjcwMTg1LCJleHAiOjE3OTk4MDYxODV9.pvrXSrIcmgmjN1TpHLHXZkW-8eYwJZhnEFMADrYRjWo",
     category: "experiencias" as Category,
     is_available: true,
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
-  {
-    id: "25",
-    name: "Spa Day para o Casal",
-    description:
-      "Dia de spa completo com massagem relaxante, sauna e tratamentos especiais.",
-    price: 700,
-    image_url: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=500&h=500&fit=crop",
-    category: "experiencias" as Category,
-    is_available: true,
-    amount_received: 0,
-    created_at: new Date().toISOString(),
-  },
+  
 ];
