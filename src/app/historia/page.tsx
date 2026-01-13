@@ -103,9 +103,7 @@ export default function HistoriaPage() {
               fill="currentColor"
             />
             <blockquote className="font-serif text-2xl md:text-3xl text-text italic leading-relaxed">
-              &ldquo;O amor não se define por grandes gestos, mas pelos pequenos
-              momentos compartilhados todos os dias. Cada sorriso seu me lembra
-              porque escolhi você para sempre.&rdquo;
+              &ldquo;Portanto deixará o homem a seu pai e a sua mãe, e unir-se-á a sua mulher, e serão uma só carne. Gênesis 2:24.&rdquo;
             </blockquote>
             <p className="mt-6 text-text-muted">
               - {weddingData.bride} & {weddingData.groom}
