@@ -137,7 +137,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-3">
                 <MapPin className="w-6 h-6 text-primary" />
-                <span className="text-xl">Local a confirmar</span>
+                <span className="text-xl">Igreja Matriz de São José</span>
               </div>
             </div>
             <p className="text-white/80 mb-8 text-lg">
