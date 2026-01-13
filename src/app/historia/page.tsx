@@ -7,38 +7,38 @@ import { weddingData } from "@/types";
 
 const timelineEvents = [
   {
-    date: "Setembro 2018",
-    title: "O Primeiro Encontro",
+    date: "04 de dezembro de 2022",
+    title: "O Começo de Tudo",
     description:
-      "Nossos caminhos se cruzaram pela primeira vez. Foi amor à primeira vista, mesmo que ainda não soubéssemos disso.",
+      "Uma data que marcou nossas vidas para sempre. Nossos olhos se cruzaram pela primeira vez. E foi ali que decidimos continuar a conversa...",
     icon: Heart,
   },
   {
-    date: "Dezembro 2018",
-    title: "Primeiro Beijo",
+    date: "05 de fevereiro de 2023",
+    title: "Pedido de Namoro",
     description:
-      "Embaixo das estrelas, em uma noite mágica, selamos nosso amor com um beijo inesquecível.",
+      "Sentados no sofá, ouvimos a frase: \"Namorando desde 05/02/2023\" e, mesmo sem noção do que estava por vir, demos nosso primeiro passo oficial juntos.",
     icon: Star,
   },
   {
-    date: "Janeiro 2020",
-    title: "Morando Juntos",
+    date: "2023 · 2024 · 2025",
+    title: "Anos de Namoro",
     description:
-      "Decidimos dar o próximo passo e construir nosso lar juntos. Cada dia ao seu lado é uma nova aventura.",
+      "Foram anos de aventuras, aprendizados e muito amor. Construímos memórias, passamos por altos e baixos, e a cada dia nosso amor se tornou mais forte.",
     icon: MapPin,
   },
   {
-    date: "Dezembro 2024",
-    title: "O Pedido de Casamento",
+    date: "20 de dezembro de 2025",
+    title: "O Pedido",
     description:
-      "Com o coração cheio de amor, veio o pedido mais especial de nossas vidas. E ela disse SIM!",
+      "O pedido de casamento veio. Delicado, simples e perfeito — exatamente como o nosso amor.",
     icon: Heart,
   },
   {
-    date: "Março 2026",
-    title: "O Grande Dia",
+    date: "07 de março de 2026",
+    title: "Nosso Para Sempre",
     description:
-      "O dia em que celebraremos nosso amor perante todos que amamos. O começo de uma nova jornada juntos.",
+      "Não sabemos todos os caminhos que o futuro nos reserva, mas sabemos que queremos trilhar cada um deles juntos, lado a lado, para sempre.",
     icon: Calendar,
   },
 ];
@@ -103,12 +103,11 @@ export default function HistoriaPage() {
               fill="currentColor"
             />
             <blockquote className="font-serif text-2xl md:text-3xl text-text italic leading-relaxed">
-              &ldquo;O amor não se define por grandes gestos, mas pelos pequenos
-              momentos compartilhados todos os dias. Cada sorriso seu me lembra
-              porque escolhi você para sempre.&rdquo;
+              &ldquo;Portanto deixará o homem a seu pai e a sua mãe, e unir-se-á
+              a sua mulher, e serão uma só carne.&rdquo;
             </blockquote>
             <p className="mt-6 text-text-muted">
-              - {weddingData.bride} & {weddingData.groom}
+              Gênesis 2:24
             </p>
           </motion.div>
         </div>
