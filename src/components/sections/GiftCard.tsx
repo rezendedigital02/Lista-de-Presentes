@@ -54,22 +54,22 @@ export function GiftCard({ gift, index = 0 }: GiftCardProps) {
         </div>
 
         {/* Content */}
-        <div className="p-4 flex-1 flex flex-col">
-          <h3 className="font-serif text-lg font-semibold text-text mb-1 line-clamp-1">
+        <div className="p-3 sm:p-4 flex-1 flex flex-col">
+          <h3 className="font-serif text-base sm:text-lg font-semibold text-text mb-1 line-clamp-2">
             {gift.name}
           </h3>
-          <p className="text-sm text-text-muted mb-3 line-clamp-2">
+          <p className="text-xs sm:text-sm text-text-muted mb-2 sm:mb-3 line-clamp-2 hidden sm:block">
             {gift.description}
           </p>
 
           {/* Price and Progress */}
-          <div className="mt-auto space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-bold text-primary">
+          <div className="mt-auto space-y-2 sm:space-y-3">
+            <div className="flex items-center justify-between flex-wrap gap-1">
+              <span className="text-lg sm:text-xl font-bold text-primary">
                 {formatCurrency(gift.price)}
               </span>
               {gift.amount_received > 0 && !isFullyFunded && (
-                <span className="text-sm text-text-muted">
+                <span className="text-xs sm:text-sm text-text-muted">
                   Faltam {formatCurrency(remaining)}
                 </span>
               )}
@@ -89,7 +89,7 @@ export function GiftCard({ gift, index = 0 }: GiftCardProps) {
             <Link href={`/presentes/${gift.id}`} className="block">
               <Button
                 variant={isFullyFunded ? "ghost" : "primary"}
-                className="w-full"
+                className="w-full text-sm sm:text-base"
                 disabled={isFullyFunded}
                 leftIcon={<GiftIcon className="w-4 h-4" />}
               >

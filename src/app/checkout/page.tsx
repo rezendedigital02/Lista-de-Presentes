@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -36,46 +36,15 @@ interface PixData {
   payment_id: number;
 }
 
-declare global {
-  interface Window {
-    MercadoPago: new (publicKey: string, options?: { locale: string }) => MercadoPagoInstance;
-  }
-}
-
-interface MercadoPagoInstance {
-  cardForm: (options: CardFormOptions) => CardFormInstance;
-}
-
-interface CardFormOptions {
-  amount: string;
-  iframe: boolean;
-  form: {
-    id: string;
-    cardNumber: { id: string; placeholder: string };
-    expirationDate: { id: string; placeholder: string };
-    securityCode: { id: string; placeholder: string };
-    cardholderName: { id: string; placeholder: string };
-    issuer: { id: string; placeholder: string };
-    installments: { id: string; placeholder: string };
-    identificationType: { id: string; placeholder: string };
-    identificationNumber: { id: string; placeholder: string };
-    cardholderEmail: { id: string; placeholder: string };
-  };
-  callbacks: {
-    onFormMounted: (error: Error | null) => void;
-    onSubmit: (event: Event) => void;
-    onFetching: (resource: string) => () => void;
-  };
-}
-
-interface CardFormInstance {
-  getCardFormData: () => {
-    token: string;
-    installments: number;
-    paymentMethodId: string;
-    issuerId: string;
-  };
-  unmount: () => void;
+interface CardData {
+  cardNumber: string;
+  cardholderName: string;
+  expirationMonth: string;
+  expirationYear: string;
+  securityCode: string;
+  identificationType: string;
+  identificationNumber: string;
+  installments: string;
 }
 
 export default function CheckoutPage() {
@@ -87,9 +56,19 @@ export default function CheckoutPage() {
   const [pixData, setPixData] = useState<PixData | null>(null);
   const [copied, setCopied] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
-  const [cardFormMounted, setCardFormMounted] = useState(false);
-  const [cardFormInstance, setCardFormInstance] = useState<CardFormInstance | null>(null);
   const [cpf, setCpf] = useState("");
+
+  // Card form state
+  const [cardData, setCardData] = useState<CardData>({
+    cardNumber: "",
+    cardholderName: "",
+    expirationMonth: "",
+    expirationYear: "",
+    securityCode: "",
+    identificationType: "CPF",
+    identificationNumber: "",
+    installments: "1",
+  });
 
   useEffect(() => {
     const stored = sessionStorage.getItem("checkoutData");
@@ -99,83 +78,6 @@ export default function CheckoutPage() {
       router.push("/presentes");
     }
   }, [router]);
-
-  // Load Mercado Pago SDK
-  useEffect(() => {
-    const publicKey = process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY;
-    if (!publicKey) return;
-
-    const script = document.createElement("script");
-    script.src = "https://sdk.mercadopago.com/js/v2";
-    script.async = true;
-    document.body.appendChild(script);
-
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
-
-  // Initialize card form when credit card is selected
-  const initializeCardForm = useCallback(() => {
-    const publicKey = process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY;
-    if (!publicKey || !checkoutData || !window.MercadoPago) return;
-
-    if (cardFormInstance) {
-      cardFormInstance.unmount();
-    }
-
-    const mp = new window.MercadoPago(publicKey, { locale: "pt-BR" });
-
-    const cardForm = mp.cardForm({
-      amount: String(checkoutData.amount),
-      iframe: true,
-      form: {
-        id: "card-form",
-        cardNumber: { id: "card-number", placeholder: "Número do cartão" },
-        expirationDate: { id: "expiration-date", placeholder: "MM/AA" },
-        securityCode: { id: "security-code", placeholder: "CVV" },
-        cardholderName: { id: "cardholder-name", placeholder: "Nome como no cartão" },
-        issuer: { id: "issuer", placeholder: "Banco emissor" },
-        installments: { id: "installments", placeholder: "Parcelas" },
-        identificationType: { id: "identification-type", placeholder: "Tipo" },
-        identificationNumber: { id: "identification-number", placeholder: "CPF" },
-        cardholderEmail: { id: "cardholder-email", placeholder: "E-mail" },
-      },
-      callbacks: {
-        onFormMounted: (err: Error | null) => {
-          if (err) {
-            console.error("Form mount error:", err);
-            setError("Erro ao carregar formulário de cartão");
-          } else {
-            setCardFormMounted(true);
-          }
-        },
-        onSubmit: async (event: Event) => {
-          event.preventDefault();
-          await handleCardPayment();
-        },
-        onFetching: (resource: string) => {
-          console.log("Fetching:", resource);
-          setIsProcessing(true);
-          return () => setIsProcessing(false);
-        },
-      },
-    });
-
-    setCardFormInstance(cardForm);
-  }, [checkoutData, cardFormInstance]);
-
-  useEffect(() => {
-    if (paymentMethod === "credit_card" && checkoutData && window.MercadoPago) {
-      // Small delay to ensure DOM is ready
-      const timer = setTimeout(() => {
-        initializeCardForm();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [paymentMethod, checkoutData, initializeCardForm]);
 
   // Poll payment status for PIX
   useEffect(() => {
@@ -208,6 +110,11 @@ export default function CheckoutPage() {
       .replace(/(\d{3})(\d)/, "$1.$2")
       .replace(/(\d{3})(\d{1,2})/, "$1-$2")
       .replace(/(-\d{2})\d+?$/, "$1");
+  };
+
+  const formatCardNumber = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    return numbers.replace(/(\d{4})(?=\d)/g, "$1 ").trim().substring(0, 19);
   };
 
   const handlePixPayment = async () => {
@@ -283,28 +190,55 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleCardPayment = async () => {
-    if (!cardFormInstance || !checkoutData) return;
+  const handleCardPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!checkoutData) return;
+
+    // Validate form
+    const cleanCardNumber = cardData.cardNumber.replace(/\s/g, "");
+    if (cleanCardNumber.length < 13) {
+      toast.error("Número do cartão inválido");
+      return;
+    }
+    if (!cardData.cardholderName) {
+      toast.error("Informe o nome no cartão");
+      return;
+    }
+    if (!cardData.expirationMonth || !cardData.expirationYear) {
+      toast.error("Informe a validade do cartão");
+      return;
+    }
+    if (cardData.securityCode.length < 3) {
+      toast.error("CVV inválido");
+      return;
+    }
+    const cleanCpf = cardData.identificationNumber.replace(/\D/g, "");
+    if (cleanCpf.length !== 11) {
+      toast.error("CPF inválido");
+      return;
+    }
 
     setIsProcessing(true);
     setError(null);
 
     try {
-      const cardFormData = cardFormInstance.getCardFormData();
-
-      const response = await fetch("/api/process-payment", {
+      // Send card data directly to our API which will create token server-side
+      const response = await fetch("/api/process-card", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          token: cardFormData.token,
+          card_number: cleanCardNumber,
+          cardholder_name: cardData.cardholderName,
+          expiration_month: cardData.expirationMonth,
+          expiration_year: `20${cardData.expirationYear}`,
+          security_code: cardData.securityCode,
+          identification_type: cardData.identificationType,
+          identification_number: cleanCpf,
+          installments: parseInt(cardData.installments),
           transaction_amount: checkoutData.amount,
-          installments: cardFormData.installments,
-          payment_method_id: cardFormData.paymentMethodId,
-          issuer_id: cardFormData.issuerId,
-          payer: {
-            email: checkoutData.guest_email,
-          },
           description: `Presente: ${checkoutData.gift_name}`,
+          payer_email: checkoutData.guest_email,
           external_reference: JSON.stringify({
             gift_id: checkoutData.gift_id,
             guest_name: checkoutData.guest_name,
@@ -328,7 +262,7 @@ export default function CheckoutPage() {
         toast.success("Pagamento em análise");
         router.push("/confirmacao?status=pending");
       } else {
-        throw new Error("Pagamento não aprovado. Tente novamente.");
+        throw new Error(data.status_detail || "Pagamento não aprovado. Tente novamente.");
       }
     } catch (err) {
       console.error("Card payment error:", err);
@@ -377,6 +311,7 @@ export default function CheckoutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
+            className="text-2xl md:text-3xl lg:text-4xl font-serif"
           >
             Finalizar Pagamento
           </motion.h1>
@@ -384,46 +319,40 @@ export default function CheckoutPage() {
       </div>
 
       {/* Content */}
-      <section className="section">
+      <section className="section py-8 md:py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
             {/* Order Summary */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="font-serif text-2xl font-bold mb-6">
+              <h2 className="font-serif text-xl md:text-2xl font-bold mb-4 md:mb-6">
                 Resumo do Pedido
               </h2>
               <Card>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 p-4 md:p-6">
                   <div className="flex gap-4">
                     <img
                       src={checkoutData.gift_image}
                       alt={checkoutData.gift_name}
-                      className="w-24 h-24 object-cover rounded-lg"
+                      className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-lg"
                     />
-                    <div>
-                      <h3 className="font-semibold text-text">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-text text-sm md:text-base truncate">
                         {checkoutData.gift_name}
                       </h3>
-                      <p className="text-text-muted text-sm">
-                        Contribuição de {checkoutData.guest_name}
+                      <p className="text-text-muted text-xs md:text-sm truncate">
+                        {checkoutData.guest_name}
                       </p>
-                      <p className="text-text-muted text-sm">
+                      <p className="text-text-muted text-xs md:text-sm truncate">
                         {checkoutData.guest_email}
                       </p>
                     </div>
                   </div>
 
                   <div className="border-t border-accent pt-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-text-muted">Contribuição</span>
-                      <span className="font-semibold">
-                        {formatCurrency(checkoutData.amount)}
-                      </span>
-                    </div>
                     <div className="flex justify-between items-center text-lg">
                       <span className="font-semibold">Total</span>
                       <span className="font-bold text-primary">
@@ -437,7 +366,7 @@ export default function CheckoutPage() {
                       <p className="text-sm text-text-muted mb-1">
                         Sua mensagem:
                       </p>
-                      <p className="text-text italic">
+                      <p className="text-text italic text-sm">
                         &ldquo;{checkoutData.message}&rdquo;
                       </p>
                     </div>
@@ -446,8 +375,8 @@ export default function CheckoutPage() {
               </Card>
 
               {/* Security Badge */}
-              <div className="mt-6 flex items-center gap-3 text-text-muted">
-                <Shield className="w-5 h-5 text-green-600" />
+              <div className="mt-4 md:mt-6 flex items-center gap-3 text-text-muted">
+                <Shield className="w-5 h-5 text-green-600 flex-shrink-0" />
                 <span className="text-sm">
                   Pagamento 100% seguro via Mercado Pago
                 </span>
@@ -460,19 +389,19 @@ export default function CheckoutPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <h2 className="font-serif text-2xl font-bold mb-6">
+              <h2 className="font-serif text-xl md:text-2xl font-bold mb-4 md:mb-6">
                 Forma de Pagamento
               </h2>
 
               {/* Payment Method Tabs */}
-              <div className="flex gap-2 mb-6">
+              <div className="flex gap-2 mb-4 md:mb-6">
                 <button
                   onClick={() => {
                     setPaymentMethod("pix");
                     setPixData(null);
                     setError(null);
                   }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 md:px-4 rounded-lg border-2 transition-all text-sm md:text-base ${
                     paymentMethod === "pix"
                       ? "border-green-500 bg-green-50 text-green-700"
                       : "border-gray-200 hover:border-gray-300"
@@ -487,7 +416,7 @@ export default function CheckoutPage() {
                     setPixData(null);
                     setError(null);
                   }}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 md:px-4 rounded-lg border-2 transition-all text-sm md:text-base ${
                     paymentMethod === "credit_card"
                       ? "border-blue-500 bg-blue-50 text-blue-700"
                       : "border-gray-200 hover:border-gray-300"
@@ -500,7 +429,7 @@ export default function CheckoutPage() {
 
               {/* Error Message */}
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+                <div className="mb-4 md:mb-6 p-3 md:p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
                   <p className="text-red-700 text-sm">{error}</p>
                 </div>
@@ -509,16 +438,16 @@ export default function CheckoutPage() {
               {/* PIX Payment */}
               {paymentMethod === "pix" && (
                 <Card>
-                  <CardContent>
+                  <CardContent className="p-4 md:p-6">
                     {!pixData ? (
                       <div className="space-y-4">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                            <QrCode className="w-6 h-6 text-green-600" />
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                            <QrCode className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
                           </div>
                           <div>
-                            <p className="font-semibold">Pagamento via PIX</p>
-                            <p className="text-sm text-text-muted">
+                            <p className="font-semibold text-sm md:text-base">Pagamento via PIX</p>
+                            <p className="text-xs md:text-sm text-text-muted">
                               Aprovação instantânea
                             </p>
                           </div>
@@ -534,7 +463,7 @@ export default function CheckoutPage() {
                             onChange={(e) => setCpf(formatCPF(e.target.value))}
                             placeholder="000.000.000-00"
                             maxLength={14}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                            className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
                           />
                         </div>
 
@@ -550,20 +479,20 @@ export default function CheckoutPage() {
                     ) : (
                       <div className="space-y-4">
                         <div className="text-center">
-                          <p className="font-semibold text-lg mb-2">
+                          <p className="font-semibold text-base md:text-lg mb-2">
                             Escaneie o QR Code
                           </p>
-                          <p className="text-sm text-text-muted mb-4">
-                            Abra o app do seu banco e escaneie o código abaixo
+                          <p className="text-xs md:text-sm text-text-muted mb-4">
+                            Abra o app do seu banco e escaneie o código
                           </p>
 
                           {/* QR Code */}
                           <div className="flex justify-center mb-4">
-                            <div className="bg-white p-4 rounded-xl shadow-lg">
+                            <div className="bg-white p-3 md:p-4 rounded-xl shadow-lg">
                               <img
                                 src={`data:image/png;base64,${pixData.qr_code_base64}`}
                                 alt="QR Code PIX"
-                                className="w-48 h-48"
+                                className="w-40 h-40 md:w-48 md:h-48"
                               />
                             </div>
                           </div>
@@ -591,7 +520,7 @@ export default function CheckoutPage() {
                                 type="text"
                                 readOnly
                                 value={pixData.qr_code}
-                                className="flex-1 text-xs bg-white px-3 py-2 rounded border truncate"
+                                className="flex-1 text-xs bg-white px-2 md:px-3 py-2 rounded border truncate"
                               />
                               <Button
                                 onClick={copyPixCode}
@@ -625,90 +554,127 @@ export default function CheckoutPage() {
               {/* Credit Card Payment */}
               {paymentMethod === "credit_card" && (
                 <Card>
-                  <CardContent>
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <CreditCard className="w-6 h-6 text-blue-600" />
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex items-center gap-3 mb-4 md:mb-6">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                       </div>
                       <div>
-                        <p className="font-semibold">Cartão de Crédito</p>
-                        <p className="text-sm text-text-muted">
+                        <p className="font-semibold text-sm md:text-base">Cartão de Crédito</p>
+                        <p className="text-xs md:text-sm text-text-muted">
                           Parcele em até 12x
                         </p>
                       </div>
                     </div>
 
-                    {!cardFormMounted && (
-                      <div className="flex items-center justify-center py-8">
-                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                        <span className="ml-2 text-text-muted">Carregando formulário...</span>
-                      </div>
-                    )}
-
-                    <form id="card-form" className="space-y-4">
+                    <form onSubmit={handleCardPayment} className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          Número do cartão
+                          Número do cartão <span className="text-red-500">*</span>
                         </label>
-                        <div id="card-number" className="h-12 rounded-lg border border-gray-300"></div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Validade
-                          </label>
-                          <div id="expiration-date" className="h-12 rounded-lg border border-gray-300"></div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            CVV
-                          </label>
-                          <div id="security-code" className="h-12 rounded-lg border border-gray-300"></div>
-                        </div>
+                        <input
+                          type="text"
+                          value={cardData.cardNumber}
+                          onChange={(e) => setCardData({ ...cardData, cardNumber: formatCardNumber(e.target.value) })}
+                          placeholder="0000 0000 0000 0000"
+                          maxLength={19}
+                          className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
+                        />
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          Nome no cartão
+                          Nome no cartão <span className="text-red-500">*</span>
                         </label>
-                        <div id="cardholder-name" className="h-12 rounded-lg border border-gray-300"></div>
+                        <input
+                          type="text"
+                          value={cardData.cardholderName}
+                          onChange={(e) => setCardData({ ...cardData, cardholderName: e.target.value.toUpperCase() })}
+                          placeholder="NOME COMO NO CARTÃO"
+                          className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base uppercase"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3 md:gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Mês <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={cardData.expirationMonth}
+                            onChange={(e) => setCardData({ ...cardData, expirationMonth: e.target.value })}
+                            className="w-full px-2 md:px-3 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
+                          >
+                            <option value="">MM</option>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                              <option key={m} value={m.toString().padStart(2, "0")}>
+                                {m.toString().padStart(2, "0")}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Ano <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={cardData.expirationYear}
+                            onChange={(e) => setCardData({ ...cardData, expirationYear: e.target.value })}
+                            className="w-full px-2 md:px-3 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
+                          >
+                            <option value="">AA</option>
+                            {Array.from({ length: 15 }, (_, i) => 24 + i).map((y) => (
+                              <option key={y} value={y.toString()}>
+                                {y}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            CVV <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={cardData.securityCode}
+                            onChange={(e) => setCardData({ ...cardData, securityCode: e.target.value.replace(/\D/g, "").substring(0, 4) })}
+                            placeholder="123"
+                            maxLength={4}
+                            className="w-full px-2 md:px-3 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
+                          />
+                        </div>
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium mb-2">
-                          E-mail
+                          CPF do titular <span className="text-red-500">*</span>
                         </label>
-                        <div id="cardholder-email" className="h-12 rounded-lg border border-gray-300"></div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Tipo Doc.
-                          </label>
-                          <div id="identification-type" className="h-12 rounded-lg border border-gray-300"></div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Documento
-                          </label>
-                          <div id="identification-number" className="h-12 rounded-lg border border-gray-300"></div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Banco emissor
-                        </label>
-                        <div id="issuer" className="h-12 rounded-lg border border-gray-300"></div>
+                        <input
+                          type="text"
+                          value={cardData.identificationNumber}
+                          onChange={(e) => setCardData({ ...cardData, identificationNumber: formatCPF(e.target.value) })}
+                          placeholder="000.000.000-00"
+                          maxLength={14}
+                          className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
+                        />
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium mb-2">
                           Parcelas
                         </label>
-                        <div id="installments" className="h-12 rounded-lg border border-gray-300"></div>
+                        <select
+                          value={cardData.installments}
+                          onChange={(e) => setCardData({ ...cardData, installments: e.target.value })}
+                          className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
+                        >
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
+                            <option key={n} value={n}>
+                              {n}x de {formatCurrency(checkoutData.amount / n)}
+                              {n === 1 ? " (à vista)" : ""}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
                       <Button
@@ -716,7 +682,6 @@ export default function CheckoutPage() {
                         isLoading={isProcessing}
                         size="lg"
                         className="w-full"
-                        disabled={!cardFormMounted}
                       >
                         {isProcessing ? "Processando..." : `Pagar ${formatCurrency(checkoutData.amount)}`}
                       </Button>
@@ -725,7 +690,7 @@ export default function CheckoutPage() {
                 </Card>
               )}
 
-              <p className="mt-4 text-sm text-text-muted text-center">
+              <p className="mt-4 text-xs md:text-sm text-text-muted text-center">
                 Seus dados estão protegidos pelo Mercado Pago
               </p>
             </motion.div>

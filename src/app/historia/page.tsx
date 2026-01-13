@@ -7,31 +7,31 @@ import { weddingData } from "@/types";
 
 const timelineEvents = [
   {
-    date: "04 de Dezembro de 2022",
+    date: "04 de dezembro de 2022",
     title: "O Começo de Tudo",
     description:
       "Uma data que marcou nossas vidas para sempre. Uma única frase foi suficiente para que acolhêssemos um ao outro. Ali nascia uma amizade e, sem sabermos, um futuro já cuidadosamente preparado por Deus.",
     icon: Heart,
   },
   {
-    date: "05 de Fevereiro de 2023",
+    date: "05 de fevereiro de 2023",
     title: "Pedido de Namoro",
     description:
-      "Sentados no sofá, ouvimos a frase que mudaria tudo: “Agora é para casar.” E não estava errado. Desde o início, sabíamos que, se era para estarmos juntos, era por um propósito maior.",
+      "Sentados no sofá, ouvimos a frase que mudaria tudo: \"Agora é para casar.\" E não estava errado. Desde o início, sabíamos que, se era para estarmos juntos, era por um propósito maior.",
     icon: Star,
   },
   {
     date: "2023 · 2024 · 2025",
-    title: "Anos de Namoro",
+    title: "Anos de namoro",
     description:
       "Foram anos de aventuras, aprendizados e conquistas. Crescemos em sabedoria, erramos e acertamos. Entre risos e lágrimas, fomos construindo, dia após dia, um belo capítulo da nossa história.",
     icon: MapPin,
   },
   {
-    date: "20 de Dezembro de 2025",
-    title: "O Pedido de Casamento",
+    date: "20 de dezembro de 2025",
+    title: "O Pedido",
     description:
-      "O pedido de casamento veio. Delicado, cheio de amor, sonhos e planos. E o “sim” veio com o coração transbordando de certeza.",
+      "O pedido de casamento veio. Delicado, cheio de amor, sonhos e planos. E o \"sim\" veio com o coração transbordando de certeza.",
     icon: Heart,
   },
   {
@@ -103,10 +103,11 @@ export default function HistoriaPage() {
               fill="currentColor"
             />
             <blockquote className="font-serif text-2xl md:text-3xl text-text italic leading-relaxed">
-              &ldquo;Portanto deixará o homem a seu pai e a sua mãe, e unir-se-á a sua mulher, e serão uma só carne. Gênesis 2:24.&rdquo;
+              &ldquo;Portanto deixará o homem a seu pai e a sua mãe, e unir-se-á
+              a sua mulher, e serão uma só carne.&rdquo;
             </blockquote>
             <p className="mt-6 text-text-muted">
-              - {weddingData.bride} & {weddingData.groom}
+              Gênesis 2:24
             </p>
           </motion.div>
         </div>

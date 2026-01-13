@@ -111,7 +111,7 @@ export const weddingData = {
   date: new Date("2026-03-07T16:00:00"),
   pixKey: "53455423000162",
   photos: [
+    "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-06%20at%2022.11.13.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0wNiBhdCAyMi4xMS4xMy5qcGVnIiwiaWF0IjoxNzY3Nzg1MTUxLCJleHAiOjE3OTkzMjExNTF9.XmLi9Dw4Rr8RlODHooTKnXQNI96paDq9HordX6OV0qU",
     "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-06%20at%2022.10.00.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0wNiBhdCAyMi4xMC4wMC5qcGVnIiwiaWF0IjoxNzY3NzQ4NTMxLCJleHAiOjE3OTkyODQ1MzF9.6xEQ3HavFXI0itE5RB3WDjlgZOUjl91rr5sNNZpx3eM",
-    "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-06%20at%2022.11.13.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0wNiBhdCAyMi4xMS4xMy5qcGVnIiwiaWF0IjoxNzY3NzQ4NTQzLCJleHAiOjE3OTkyODQ1NDN9.t3KIsiOANGMrI8hUSNfbi7O3wcp698bOfn3Q_BsvfO0",
   ],
 };
