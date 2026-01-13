@@ -63,10 +63,10 @@ export function Hero() {
             <p className="text-base sm:text-lg md:text-xl text-primary-light font-medium mb-1 sm:mb-2">
               Celebrando o amor de
             </p>
-            <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold">
-              {weddingData.bride}
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-tight">
+              <span className="block sm:inline">{weddingData.bride}</span>
               <span className="text-primary mx-2 sm:mx-4">&</span>
-              {weddingData.groom}
+              <span className="block sm:inline">{weddingData.groom}</span>
             </h1>
           </motion.div>
 
