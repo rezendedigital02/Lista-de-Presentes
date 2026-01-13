@@ -7,38 +7,38 @@ import { weddingData } from "@/types";
 
 const timelineEvents = [
   {
-    date: "Setembro 2018",
-    title: "O Primeiro Encontro",
+    date: "04 de Dezembro de 2022",
+    title: "O Começo de Tudo",
     description:
-      "Nossos caminhos se cruzaram pela primeira vez. Foi amor à primeira vista, mesmo que ainda não soubéssemos disso.",
+      "Uma data que marcou nossas vidas para sempre. Uma única frase foi suficiente para que acolhêssemos um ao outro. Ali nascia uma amizade e, sem sabermos, um futuro já cuidadosamente preparado por Deus.",
     icon: Heart,
   },
   {
-    date: "Dezembro 2018",
-    title: "Primeiro Beijo",
+    date: "05 de Fevereiro de 2023",
+    title: "Pedido de Namoro",
     description:
-      "Embaixo das estrelas, em uma noite mágica, selamos nosso amor com um beijo inesquecível.",
+      "Sentados no sofá, ouvimos a frase que mudaria tudo: “Agora é para casar.” E não estava errado. Desde o início, sabíamos que, se era para estarmos juntos, era por um propósito maior.",
     icon: Star,
   },
   {
-    date: "Janeiro 2020",
-    title: "Morando Juntos",
+    date: "2023 · 2024 · 2025",
+    title: "Anos de Namoro",
     description:
-      "Decidimos dar o próximo passo e construir nosso lar juntos. Cada dia ao seu lado é uma nova aventura.",
+      "Foram anos de aventuras, aprendizados e conquistas. Crescemos em sabedoria, erramos e acertamos. Entre risos e lágrimas, fomos construindo, dia após dia, um belo capítulo da nossa história.",
     icon: MapPin,
   },
   {
-    date: "Dezembro 2024",
+    date: "20 de Dezembro de 2025",
     title: "O Pedido de Casamento",
     description:
-      "Com o coração cheio de amor, veio o pedido mais especial de nossas vidas. E ela disse SIM!",
+      "O pedido de casamento veio. Delicado, cheio de amor, sonhos e planos. E o “sim” veio com o coração transbordando de certeza.",
     icon: Heart,
   },
   {
-    date: "Março 2026",
-    title: "O Grande Dia",
+    date: "07 de março de 2026",
+    title: "Nosso Para Sempre",
     description:
-      "O dia em que celebraremos nosso amor perante todos que amamos. O começo de uma nova jornada juntos.",
+      "Não sabemos todos os caminhos que Deus tem para nós, mas seguimos confiantes, construindo nossa vida a partir da direção que Ele nos dá. Nosso maior desejo é formar uma família alicerçada nos valores que aprendemos e vivemos juntamente com o que aprendemos na nossa familia. Seremos nós, talvez com um, três ou cinco filhos, mas sempre com amor, fé e união.",
     icon: Calendar,
   },
 ];
