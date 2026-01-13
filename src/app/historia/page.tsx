@@ -10,35 +10,35 @@ const timelineEvents = [
     date: "04 de dezembro de 2022",
     title: "O Começo de Tudo",
     description:
-      "Uma data que marcou nossas vidas para sempre. Nossos olhos se cruzaram pela primeira vez. E foi ali que decidimos continuar a conversa...",
+      "Uma data que marcou nossas vidas para sempre. Uma única frase foi suficiente para que acolhêssemos um ao outro. Ali nascia uma amizade e, sem sabermos, um futuro já cuidadosamente preparado por Deus.",
     icon: Heart,
   },
   {
     date: "05 de fevereiro de 2023",
     title: "Pedido de Namoro",
     description:
-      "Sentados no sofá, ouvimos a frase: \"Namorando desde 05/02/2023\" e, mesmo sem noção do que estava por vir, demos nosso primeiro passo oficial juntos.",
+      "Sentados no sofá, ouvimos a frase que mudaria tudo: \"Agora é para casar.\" E não estava errado. Desde o início, sabíamos que, se era para estarmos juntos, era por um propósito maior.",
     icon: Star,
   },
   {
     date: "2023 · 2024 · 2025",
-    title: "Anos de Namoro",
+    title: "Anos de namoro",
     description:
-      "Foram anos de aventuras, aprendizados e muito amor. Construímos memórias, passamos por altos e baixos, e a cada dia nosso amor se tornou mais forte.",
+      "Foram anos de aventuras, aprendizados e conquistas. Crescemos em sabedoria, erramos e acertamos. Entre risos e lágrimas, fomos construindo, dia após dia, um belo capítulo da nossa história.",
     icon: MapPin,
   },
   {
     date: "20 de dezembro de 2025",
     title: "O Pedido",
     description:
-      "O pedido de casamento veio. Delicado, simples e perfeito — exatamente como o nosso amor.",
+      "O pedido de casamento veio. Delicado, cheio de amor, sonhos e planos. E o \"sim\" veio com o coração transbordando de certeza.",
     icon: Heart,
   },
   {
     date: "07 de março de 2026",
     title: "Nosso Para Sempre",
     description:
-      "Não sabemos todos os caminhos que o futuro nos reserva, mas sabemos que queremos trilhar cada um deles juntos, lado a lado, para sempre.",
+      "Não sabemos todos os caminhos que Deus tem para nós, mas seguimos confiantes, construindo nossa vida a partir da direção que Ele nos dá. Nosso maior desejo é formar uma família alicerçada nos valores que aprendemos e vivemos juntamente com o que aprendemos na nossa familia. Seremos nós, talvez com um, três ou cinco filhos, mas sempre com amor, fé e união.",
     icon: Calendar,
   },
 ];
