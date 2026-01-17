@@ -408,18 +408,6 @@ export const initialGifts: Gift[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "34",
-    name: "Microondas",
-    description:
-      "Emanuel não gosta, mas eu amo!!!",
-    price: 549,
-    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.55.20.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41NS4yMC5qcGVnIiwiaWF0IjoxNzY4MjY5NjUwLCJleHAiOjE3OTk4MDU2NTB9.ercCsnfB-u9UgR5VLXAF7Uk-FqS87FYu-nOokUFIFM8",
-    category: "cozinha" as Category,
-    is_available: true,
-    amount_received: 0,
-    created_at: new Date().toISOString(),
-  },
-  {
     id: "35",
     name: "Lavadora de Roupas",
     description:
