@@ -254,15 +254,16 @@ export default function CheckoutPage() {
         throw new Error(data.error || "Erro ao processar pagamento");
       }
 
-      if (data.status === "approved") {
+      if (data.success && (data.status === "approved" || data.status === "authorized")) {
         toast.success("Pagamento aprovado!");
         sessionStorage.removeItem("checkoutData");
         router.push("/confirmacao?status=approved");
-      } else if (data.status === "in_process" || data.status === "pending") {
+      } else if (data.success && (data.status === "in_process" || data.status === "pending")) {
         toast.success("Pagamento em análise");
+        sessionStorage.removeItem("checkoutData");
         router.push("/confirmacao?status=pending");
       } else {
-        throw new Error(data.status_detail || "Pagamento não aprovado. Tente novamente.");
+        throw new Error(data.error || data.status_detail || "Pagamento não aprovado. Tente novamente.");
       }
     } catch (err) {
       console.error("Card payment error:", err);
@@ -623,7 +624,7 @@ export default function CheckoutPage() {
                             className="w-full px-2 md:px-3 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
                           >
                             <option value="">AA</option>
-                            {Array.from({ length: 15 }, (_, i) => 24 + i).map((y) => (
+                            {Array.from({ length: 15 }, (_, i) => 26 + i).map((y) => (
                               <option key={y} value={y.toString()}>
                                 {y}
                               </option>
