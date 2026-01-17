@@ -508,18 +508,6 @@ export const initialGifts: Gift[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "43",
-    name: "Processador de Alimentos",
-    description:
-      "Processador de alimentos multifuncional para facilitar o preparo das refeições.",
-    price: 159.90,
-    image_url: "https://images.unsplash.com/photo-1585237017125-24baf8d7406f?w=400",
-    category: "cozinha" as Category,
-    is_available: true,
-    amount_received: 0,
-    created_at: new Date().toISOString(),
-  },
-  {
     id: "44",
     name: "Faqueiro",
     description:
