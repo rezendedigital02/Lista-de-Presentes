@@ -465,7 +465,7 @@ export const initialGifts: Gift[] = [
     description:
       "Kit completo para churrasco com utensílios de qualidade.",
     price: 270,
-    image_url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/kit%20churrasco.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8va2l0IGNodXJyYXNjby53ZWJwIiwiaWF0IjoxNzY4NjUyOTMzLCJleHAiOjE4MDAxODg5MzN9.cvZhhMB19L61w3cjfPUnuEFzIJyzcNp2doBPkmievBg",
     category: "cozinha" as Category,
     is_available: true,
     amount_received: 0,
@@ -477,7 +477,7 @@ export const initialGifts: Gift[] = [
     description:
       "Jarra de vidro elegante para servir sucos e bebidas.",
     price: 39,
-    image_url: "https://images.unsplash.com/photo-1481671703460-040cb8a2d909?w=400",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/jarra%20de%20suco.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vamFycmEgZGUgc3Vjby5qcGciLCJpYXQiOjE3Njg2NTI5ODYsImV4cCI6MTgwMDE4ODk4Nn0.0AKEhfpHWkfA1cSfSAP2SFYDR7aO7JrojL9XD7xrI7o",
     category: "cozinha" as Category,
     is_available: true,
     amount_received: 0,
@@ -501,7 +501,7 @@ export const initialGifts: Gift[] = [
     description:
       "Conjunto de toalhas de rosto macias e absorventes.",
     price: 139.90,
-    image_url: "https://images.unsplash.com/photo-1616627547584-bf28cee262db?w=400",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/toalha%20de%20rosto.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vdG9hbGhhIGRlIHJvc3RvLmpwZyIsImlhdCI6MTc2ODY1MzAwNiwiZXhwIjoxODAwMTg5MDA2fQ.8HLX8PrIfyamG4e6q-lnd1FrU98yzKwuGiVhB32b6BA",
     category: "banheiro" as Category,
     is_available: true,
     amount_received: 0,
@@ -513,7 +513,7 @@ export const initialGifts: Gift[] = [
     description:
       "Faqueiro completo em aço inox para todas as refeições.",
     price: 355,
-    image_url: "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=400",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/faqueiro.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vZmFxdWVpcm8uanBnIiwiaWF0IjoxNzY4NjUzMDIwLCJleHAiOjE4MDAxODkwMjB9.ixwvZVSw_i4sybB6VXvKByT6Gz0MwCF-3S4ANCOwqi0",
     category: "cozinha" as Category,
     is_available: true,
     amount_received: 0,
@@ -525,7 +525,7 @@ export const initialGifts: Gift[] = [
     description:
       "Ferro de passar a vapor para manter as roupas sempre impecáveis.",
     price: 199.90,
-    image_url: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=400",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/ferro%20de%20passar.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vZmVycm8gZGUgcGFzc2FyLmpwZyIsImlhdCI6MTc2ODY1MzAzMiwiZXhwIjoxODAwMTg5MDMyfQ.nTD-Bui8NzLtlSUfKUcBh9WB_xafZX2xZGYKSd5-_YI",
     category: "eletrodomesticos" as Category,
     is_available: true,
     amount_received: 0,
@@ -549,7 +549,7 @@ export const initialGifts: Gift[] = [
     description:
       "Ventilador potente para refrescar os dias quentes.",
     price: 230,
-    image_url: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400",
+      image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/ventilador.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vdmVudGlsYWRvci5qcGciLCJpYXQiOjE3Njg2NTMwNDcsImV4cCI6MTgwMDE4OTA0N30.HXZfNCSNuc9Ff7y3pKXq-nlfN1_-QXVAPwFrgpPNMHE",
     category: "eletrodomesticos" as Category,
     is_available: true,
     amount_received: 0,
@@ -561,7 +561,7 @@ export const initialGifts: Gift[] = [
     description:
       "Organizador de temperos para deixar a cozinha mais prática.",
     price: 96.90,
-    image_url: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/porta%20tempero.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vcG9ydGEgdGVtcGVyby53ZWJwIiwiaWF0IjoxNzY4NjUzMDYyLCJleHAiOjE4MDAxODkwNjJ9.CK1AlzQyu8wY9eYN9_ei_c8U2QEfEfuLjKjWYk65dJY",
     category: "cozinha" as Category,
     is_available: true,
     amount_received: 0,
@@ -573,7 +573,7 @@ export const initialGifts: Gift[] = [
     description:
       "Conjunto de tábuas de corte em diferentes tamanhos.",
     price: 119.90,
-    image_url: "https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=400",
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/tabua.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vdGFidWEuanBnIiwiaWF0IjoxNzY4NjUzMDc0LCJleHAiOjE4MDAxODkwNzR9.oxAXAnHZ4rESfjpzD1OV7dv7tHdCHmCURZUYo3caYVo",
     category: "cozinha" as Category,
     is_available: true,
     amount_received: 0,
