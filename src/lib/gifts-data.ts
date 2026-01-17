@@ -408,18 +408,6 @@ export const initialGifts: Gift[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: "34",
-    name: "Microondas",
-    description:
-      "Emanuel não gosta, mas eu amo!!!",
-    price: 549,
-    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/WhatsApp%20Image%202026-01-12%20at%2021.55.20.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vV2hhdHNBcHAgSW1hZ2UgMjAyNi0wMS0xMiBhdCAyMS41NS4yMC5qcGVnIiwiaWF0IjoxNzY4MjY5NjUwLCJleHAiOjE3OTk4MDU2NTB9.ercCsnfB-u9UgR5VLXAF7Uk-FqS87FYu-nOokUFIFM8",
-    category: "cozinha" as Category,
-    is_available: true,
-    amount_received: 0,
-    created_at: new Date().toISOString(),
-  },
-  {
     id: "35",
     name: "Lavadora de Roupas",
     description:
@@ -469,5 +457,127 @@ export const initialGifts: Gift[] = [
     amount_received: 0,
     created_at: new Date().toISOString(),
   },
-  
+
+  // Novos produtos
+  {
+    id: "39",
+    name: "Kit Churrasco",
+    description:
+      "Kit completo para churrasco com utensílios de qualidade.",
+    price: 270,
+    image_url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "40",
+    name: "Jarra de Suco",
+    description:
+      "Jarra de vidro elegante para servir sucos e bebidas.",
+    price: 39,
+    image_url: "https://images.unsplash.com/photo-1481671703460-040cb8a2d909?w=400",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "41",
+    name: "Televisão 50 4K",
+    description:
+      "Smart TV 50 polegadas 4K para nossos momentos de lazer juntos.",
+    price: 1880,
+    image_url: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400",
+    category: "eletrodomesticos" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "42",
+    name: "Toalhas de Rosto",
+    description:
+      "Conjunto de toalhas de rosto macias e absorventes.",
+    price: 139.90,
+    image_url: "https://images.unsplash.com/photo-1616627547584-bf28cee262db?w=400",
+    category: "banheiro" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "44",
+    name: "Faqueiro",
+    description:
+      "Faqueiro completo em aço inox para todas as refeições.",
+    price: 355,
+    image_url: "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=400",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "45",
+    name: "Ferro de Passar Roupa",
+    description:
+      "Ferro de passar a vapor para manter as roupas sempre impecáveis.",
+    price: 199.90,
+    image_url: "https://images.unsplash.com/photo-1558317374-067fb5f30001?w=400",
+    category: "eletrodomesticos" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "46",
+    name: "Conjunto de Jantar Mesa",
+    description:
+      "Mesa de jantar elegante para reunir a família.",
+    price: 2000,
+    image_url: "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=400",
+    category: "sala" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "47",
+    name: "Ventilador",
+    description:
+      "Ventilador potente para refrescar os dias quentes.",
+    price: 230,
+    image_url: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400",
+    category: "eletrodomesticos" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "48",
+    name: "Porta Temperos",
+    description:
+      "Organizador de temperos para deixar a cozinha mais prática.",
+    price: 96.90,
+    image_url: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "49",
+    name: "Tábuas de Corte",
+    description:
+      "Conjunto de tábuas de corte em diferentes tamanhos.",
+    price: 119.90,
+    image_url: "https://images.unsplash.com/photo-1594226801341-41427b4e5c22?w=400",
+    category: "cozinha" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+  },
+
 ];
