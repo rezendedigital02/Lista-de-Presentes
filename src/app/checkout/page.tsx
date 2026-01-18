@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -17,6 +17,12 @@ import {
 import Link from "next/link";
 import { Button, Card, CardContent } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
+
+declare global {
+  interface Window {
+    MercadoPago: any;
+  }
+}
 
 interface CheckoutData {
   gift_id: string;
@@ -36,17 +42,6 @@ interface PixData {
   payment_id: number;
 }
 
-interface CardData {
-  cardNumber: string;
-  cardholderName: string;
-  expirationMonth: string;
-  expirationYear: string;
-  securityCode: string;
-  identificationType: string;
-  identificationNumber: string;
-  installments: string;
-}
-
 export default function CheckoutPage() {
   const router = useRouter();
   const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
@@ -57,18 +52,14 @@ export default function CheckoutPage() {
   const [copied, setCopied] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [cpf, setCpf] = useState("");
+  const [mpReady, setMpReady] = useState(false);
+  const [cardFormMounted, setCardFormMounted] = useState(false);
 
   // Card form state
-  const [cardData, setCardData] = useState<CardData>({
-    cardNumber: "",
-    cardholderName: "",
-    expirationMonth: "",
-    expirationYear: "",
-    securityCode: "",
-    identificationType: "CPF",
-    identificationNumber: "",
-    installments: "1",
-  });
+  const [cardholderName, setCardholderName] = useState("");
+  const [identificationType, setIdentificationType] = useState("CPF");
+  const [identificationNumber, setIdentificationNumber] = useState("");
+  const [installments, setInstallments] = useState("1");
 
   useEffect(() => {
     const stored = sessionStorage.getItem("checkoutData");
@@ -78,6 +69,175 @@ export default function CheckoutPage() {
       router.push("/presentes");
     }
   }, [router]);
+
+  // Initialize MercadoPago SDK
+  useEffect(() => {
+    const initMP = () => {
+      if (window.MercadoPago && process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
+        setMpReady(true);
+      }
+    };
+
+    if (window.MercadoPago) {
+      initMP();
+    } else {
+      const checkInterval = setInterval(() => {
+        if (window.MercadoPago) {
+          initMP();
+          clearInterval(checkInterval);
+        }
+      }, 100);
+
+      return () => clearInterval(checkInterval);
+    }
+  }, []);
+
+  // Mount CardForm when switching to credit card
+  const mountCardForm = useCallback(() => {
+    if (!mpReady || !checkoutData || cardFormMounted || paymentMethod !== "credit_card") return;
+
+    const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY, {
+      locale: "pt-BR",
+    });
+
+    const cardForm = mp.cardForm({
+      amount: String(checkoutData.amount),
+      iframe: true,
+      form: {
+        id: "form-checkout",
+        cardNumber: {
+          id: "form-checkout__cardNumber",
+          placeholder: "Número do cartão",
+        },
+        expirationDate: {
+          id: "form-checkout__expirationDate",
+          placeholder: "MM/AA",
+        },
+        securityCode: {
+          id: "form-checkout__securityCode",
+          placeholder: "CVV",
+        },
+        cardholderName: {
+          id: "form-checkout__cardholderName",
+          placeholder: "Titular do cartão",
+        },
+        issuer: {
+          id: "form-checkout__issuer",
+          placeholder: "Banco emissor",
+        },
+        installments: {
+          id: "form-checkout__installments",
+          placeholder: "Parcelas",
+        },
+        identificationType: {
+          id: "form-checkout__identificationType",
+          placeholder: "Tipo de documento",
+        },
+        identificationNumber: {
+          id: "form-checkout__identificationNumber",
+          placeholder: "CPF",
+        },
+      },
+      callbacks: {
+        onFormMounted: (error: any) => {
+          if (error) {
+            console.error("CardForm mount error:", error);
+            toast.error("Erro ao carregar formulário de pagamento");
+          } else {
+            setCardFormMounted(true);
+          }
+        },
+        onSubmit: async (event: any) => {
+          event.preventDefault();
+          setIsProcessing(true);
+          setError(null);
+
+          try {
+            const formData = cardForm.getCardFormData();
+
+            if (!formData.token) {
+              throw new Error("Não foi possível processar o cartão. Verifique os dados.");
+            }
+
+            const response = await fetch("/api/process-card", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                token: formData.token,
+                payment_method_id: formData.paymentMethodId,
+                issuer_id: formData.issuerId,
+                installments: Number(formData.installments),
+                transaction_amount: checkoutData.amount,
+                description: `Presente: ${checkoutData.gift_name}`,
+                payer_email: checkoutData.guest_email,
+                identification_type: formData.identificationType,
+                identification_number: formData.identificationNumber,
+                external_reference: JSON.stringify({
+                  gift_id: checkoutData.gift_id,
+                  guest_name: checkoutData.guest_name,
+                  guest_email: checkoutData.guest_email,
+                  message: checkoutData.message || "",
+                }),
+              }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              throw new Error(data.error || "Erro ao processar pagamento");
+            }
+
+            if (data.success && (data.status === "approved" || data.status === "authorized")) {
+              toast.success("Pagamento aprovado!");
+              sessionStorage.removeItem("checkoutData");
+              router.push("/confirmacao?status=approved");
+            } else if (data.success && (data.status === "in_process" || data.status === "pending")) {
+              toast.success("Pagamento em análise");
+              sessionStorage.removeItem("checkoutData");
+              router.push("/confirmacao?status=pending");
+            } else {
+              throw new Error(data.error || data.status_detail || "Pagamento não aprovado.");
+            }
+          } catch (err) {
+            console.error("Card payment error:", err);
+            const message = err instanceof Error ? err.message : "Erro ao processar pagamento";
+            setError(message);
+            toast.error(message);
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        onFetching: (resource: string) => {
+          const progressBar = document.querySelector(".progress-bar");
+          if (progressBar) {
+            progressBar.classList.remove("hidden");
+          }
+          return () => {
+            if (progressBar) {
+              progressBar.classList.add("hidden");
+            }
+          };
+        },
+        onError: (error: any) => {
+          console.error("CardForm error:", error);
+        },
+      },
+    });
+
+    return () => {
+      if (cardForm) {
+        cardForm.unmount();
+        setCardFormMounted(false);
+      }
+    };
+  }, [mpReady, checkoutData, cardFormMounted, paymentMethod, router]);
+
+  useEffect(() => {
+    if (paymentMethod === "credit_card" && mpReady && checkoutData && !cardFormMounted) {
+      const timeout = setTimeout(mountCardForm, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [paymentMethod, mpReady, checkoutData, cardFormMounted, mountCardForm]);
 
   // Poll payment status for PIX
   useEffect(() => {
@@ -110,11 +270,6 @@ export default function CheckoutPage() {
       .replace(/(\d{3})(\d)/, "$1.$2")
       .replace(/(\d{3})(\d{1,2})/, "$1-$2")
       .replace(/(-\d{2})\d+?$/, "$1");
-  };
-
-  const formatCardNumber = (value: string) => {
-    const numbers = value.replace(/\D/g, "");
-    return numbers.replace(/(\d{4})(?=\d)/g, "$1 ").trim().substring(0, 19);
   };
 
   const handlePixPayment = async () => {
@@ -190,91 +345,6 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleCardPayment = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!checkoutData) return;
-
-    // Validate form
-    const cleanCardNumber = cardData.cardNumber.replace(/\s/g, "");
-    if (cleanCardNumber.length < 13) {
-      toast.error("Número do cartão inválido");
-      return;
-    }
-    if (!cardData.cardholderName) {
-      toast.error("Informe o nome no cartão");
-      return;
-    }
-    if (!cardData.expirationMonth || !cardData.expirationYear) {
-      toast.error("Informe a validade do cartão");
-      return;
-    }
-    if (cardData.securityCode.length < 3) {
-      toast.error("CVV inválido");
-      return;
-    }
-    const cleanCpf = cardData.identificationNumber.replace(/\D/g, "");
-    if (cleanCpf.length !== 11) {
-      toast.error("CPF inválido");
-      return;
-    }
-
-    setIsProcessing(true);
-    setError(null);
-
-    try {
-      // Send card data directly to our API which will create token server-side
-      const response = await fetch("/api/process-card", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          card_number: cleanCardNumber,
-          cardholder_name: cardData.cardholderName,
-          expiration_month: cardData.expirationMonth,
-          expiration_year: `20${cardData.expirationYear}`,
-          security_code: cardData.securityCode,
-          identification_type: cardData.identificationType,
-          identification_number: cleanCpf,
-          installments: parseInt(cardData.installments),
-          transaction_amount: checkoutData.amount,
-          description: `Presente: ${checkoutData.gift_name}`,
-          payer_email: checkoutData.guest_email,
-          external_reference: JSON.stringify({
-            gift_id: checkoutData.gift_id,
-            guest_name: checkoutData.guest_name,
-            guest_email: checkoutData.guest_email,
-            message: checkoutData.message || "",
-          }),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Erro ao processar pagamento");
-      }
-
-      if (data.success && (data.status === "approved" || data.status === "authorized")) {
-        toast.success("Pagamento aprovado!");
-        sessionStorage.removeItem("checkoutData");
-        router.push("/confirmacao?status=approved");
-      } else if (data.success && (data.status === "in_process" || data.status === "pending")) {
-        toast.success("Pagamento em análise");
-        sessionStorage.removeItem("checkoutData");
-        router.push("/confirmacao?status=pending");
-      } else {
-        throw new Error(data.error || data.status_detail || "Pagamento não aprovado. Tente novamente.");
-      }
-    } catch (err) {
-      console.error("Card payment error:", err);
-      const message = err instanceof Error ? err.message : "Erro ao processar pagamento";
-      setError(message);
-      toast.error(message);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const copyPixCode = async () => {
     if (!pixData?.qr_code) return;
 
@@ -318,6 +388,9 @@ export default function CheckoutPage() {
           </motion.h1>
         </div>
       </div>
+
+      {/* Progress bar for card form */}
+      <div className="progress-bar hidden fixed top-0 left-0 right-0 h-1 bg-primary z-50" />
 
       {/* Content */}
       <section className="section py-8 md:py-12">
@@ -552,7 +625,7 @@ export default function CheckoutPage() {
                 </Card>
               )}
 
-              {/* Credit Card Payment */}
+              {/* Credit Card Payment with SDK */}
               {paymentMethod === "credit_card" && (
                 <Card>
                   <CardContent className="p-4 md:p-6">
@@ -568,125 +641,103 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <form onSubmit={handleCardPayment} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Número do cartão <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={cardData.cardNumber}
-                          onChange={(e) => setCardData({ ...cardData, cardNumber: formatCardNumber(e.target.value) })}
-                          placeholder="0000 0000 0000 0000"
-                          maxLength={19}
-                          className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
-                        />
+                    {!mpReady ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        <span className="ml-2 text-text-muted">Carregando...</span>
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Nome no cartão <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={cardData.cardholderName}
-                          onChange={(e) => setCardData({ ...cardData, cardholderName: e.target.value.toUpperCase() })}
-                          placeholder="NOME COMO NO CARTÃO"
-                          className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base uppercase"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-3 gap-3 md:gap-4">
+                    ) : (
+                      <form id="form-checkout" className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium mb-2">
-                            Mês <span className="text-red-500">*</span>
+                            Número do cartão <span className="text-red-500">*</span>
                           </label>
-                          <select
-                            value={cardData.expirationMonth}
-                            onChange={(e) => setCardData({ ...cardData, expirationMonth: e.target.value })}
-                            className="w-full px-2 md:px-3 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
-                          >
-                            <option value="">MM</option>
-                            {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                              <option key={m} value={m.toString().padStart(2, "0")}>
-                                {m.toString().padStart(2, "0")}
-                              </option>
-                            ))}
-                          </select>
+                          <div
+                            id="form-checkout__cardNumber"
+                            className="w-full h-12 rounded-lg border border-gray-300"
+                          />
                         </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Validade <span className="text-red-500">*</span>
+                            </label>
+                            <div
+                              id="form-checkout__expirationDate"
+                              className="w-full h-12 rounded-lg border border-gray-300"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              CVV <span className="text-red-500">*</span>
+                            </label>
+                            <div
+                              id="form-checkout__securityCode"
+                              className="w-full h-12 rounded-lg border border-gray-300"
+                            />
+                          </div>
+                        </div>
+
                         <div>
                           <label className="block text-sm font-medium mb-2">
-                            Ano <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            value={cardData.expirationYear}
-                            onChange={(e) => setCardData({ ...cardData, expirationYear: e.target.value })}
-                            className="w-full px-2 md:px-3 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
-                          >
-                            <option value="">AA</option>
-                            {Array.from({ length: 15 }, (_, i) => 26 + i).map((y) => (
-                              <option key={y} value={y.toString()}>
-                                {y}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            CVV <span className="text-red-500">*</span>
+                            Nome no cartão <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="text"
-                            value={cardData.securityCode}
-                            onChange={(e) => setCardData({ ...cardData, securityCode: e.target.value.replace(/\D/g, "").substring(0, 4) })}
-                            placeholder="123"
-                            maxLength={4}
-                            className="w-full px-2 md:px-3 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
+                            id="form-checkout__cardholderName"
+                            className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base uppercase"
+                            placeholder="NOME COMO NO CARTÃO"
                           />
                         </div>
-                      </div>
 
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          CPF do titular <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={cardData.identificationNumber}
-                          onChange={(e) => setCardData({ ...cardData, identificationNumber: formatCPF(e.target.value) })}
-                          placeholder="000.000.000-00"
-                          maxLength={14}
-                          className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
-                        />
-                      </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Tipo <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                              id="form-checkout__identificationType"
+                              className="w-full px-3 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2">
+                              Documento <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              id="form-checkout__identificationNumber"
+                              className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
+                              placeholder="CPF"
+                            />
+                          </div>
+                        </div>
 
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Parcelas
-                        </label>
-                        <select
-                          value={cardData.installments}
-                          onChange={(e) => setCardData({ ...cardData, installments: e.target.value })}
-                          className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
+                        <div className="hidden">
+                          <select id="form-checkout__issuer" />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Parcelas
+                          </label>
+                          <select
+                            id="form-checkout__installments"
+                            className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
+                          />
+                        </div>
+
+                        <Button
+                          type="submit"
+                          isLoading={isProcessing}
+                          size="lg"
+                          className="w-full"
                         >
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
-                            <option key={n} value={n}>
-                              {n}x de {formatCurrency(checkoutData.amount / n)}
-                              {n === 1 ? " (à vista)" : ""}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <Button
-                        type="submit"
-                        isLoading={isProcessing}
-                        size="lg"
-                        className="w-full"
-                      >
-                        {isProcessing ? "Processando..." : `Pagar ${formatCurrency(checkoutData.amount)}`}
-                      </Button>
-                    </form>
+                          {isProcessing ? "Processando..." : `Pagar ${formatCurrency(checkoutData.amount)}`}
+                        </Button>
+                      </form>
+                    )}
                   </CardContent>
                 </Card>
               )}
