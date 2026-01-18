@@ -264,6 +264,7 @@ export default function CheckoutPage() {
           transaction_amount: checkoutData.amount,
           description: `Presente: ${checkoutData.gift_name}`,
           payer_email: checkoutData.guest_email,
+          payer_name: cardholderName,
           identification_type: "CPF",
           identification_number: cleanDocument,
           external_reference: JSON.stringify({

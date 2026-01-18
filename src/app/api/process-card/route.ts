@@ -9,9 +9,11 @@ const cardPaymentSchema = z.object({
   transaction_amount: z.number().min(1),
   description: z.string(),
   payer_email: z.string().email(),
+  payer_name: z.string().optional(),
   identification_type: z.string().default("CPF"),
   identification_number: z.string().min(11),
   external_reference: z.string(),
+  device_id: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -46,11 +48,28 @@ export async function POST(request: NextRequest) {
           installments: data.installments,
           payment_method_id: data.payment_method_id,
           issuer_id: data.issuer_id || undefined,
+          binary_mode: true,
           payer: {
             email: data.payer_email,
+            first_name: data.payer_name?.split(" ")[0] || "Cliente",
+            last_name: data.payer_name?.split(" ").slice(1).join(" ") || "Lista Presentes",
             identification: {
               type: data.identification_type,
               number: data.identification_number.replace(/\D/g, ""),
+            },
+          },
+          additional_info: {
+            items: [
+              {
+                id: "gift",
+                title: data.description,
+                quantity: 1,
+                unit_price: data.transaction_amount,
+              },
+            ],
+            payer: {
+              first_name: data.payer_name?.split(" ")[0] || "Cliente",
+              last_name: data.payer_name?.split(" ").slice(1).join(" ") || "Lista Presentes",
             },
           },
           external_reference: data.external_reference,
