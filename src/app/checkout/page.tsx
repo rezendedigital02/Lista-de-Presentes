@@ -20,6 +20,7 @@ import { formatCurrency } from "@/lib/utils";
 
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     MercadoPago: any;
   }
 }
@@ -55,11 +56,6 @@ export default function CheckoutPage() {
   const [mpReady, setMpReady] = useState(false);
   const [cardFormMounted, setCardFormMounted] = useState(false);
 
-  // Card form state
-  const [cardholderName, setCardholderName] = useState("");
-  const [identificationType, setIdentificationType] = useState("CPF");
-  const [identificationNumber, setIdentificationNumber] = useState("");
-  const [installments, setInstallments] = useState("1");
 
   useEffect(() => {
     const stored = sessionStorage.getItem("checkoutData");
@@ -139,7 +135,7 @@ export default function CheckoutPage() {
         },
       },
       callbacks: {
-        onFormMounted: (error: any) => {
+        onFormMounted: (error: Error | null) => {
           if (error) {
             console.error("CardForm mount error:", error);
             toast.error("Erro ao carregar formulário de pagamento");
@@ -147,7 +143,7 @@ export default function CheckoutPage() {
             setCardFormMounted(true);
           }
         },
-        onSubmit: async (event: any) => {
+        onSubmit: async (event: Event) => {
           event.preventDefault();
           setIsProcessing(true);
           setError(null);
@@ -207,7 +203,7 @@ export default function CheckoutPage() {
             setIsProcessing(false);
           }
         },
-        onFetching: (resource: string) => {
+        onFetching: () => {
           const progressBar = document.querySelector(".progress-bar");
           if (progressBar) {
             progressBar.classList.remove("hidden");
@@ -218,7 +214,7 @@ export default function CheckoutPage() {
             }
           };
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
           console.error("CardForm error:", error);
         },
       },
