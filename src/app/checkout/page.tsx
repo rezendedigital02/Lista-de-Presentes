@@ -263,6 +263,8 @@ export default function CheckoutPage() {
           installments: installments,
           transaction_amount: checkoutData.amount,
           description: `Presente: ${checkoutData.gift_name}`,
+          gift_id: checkoutData.gift_id,
+          gift_name: checkoutData.gift_name,
           payer_email: checkoutData.guest_email,
           payer_name: cardholderName,
           identification_type: "CPF",
@@ -332,6 +334,8 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           transaction_amount: checkoutData.amount,
           description: `Presente: ${checkoutData.gift_name}`,
+          gift_id: checkoutData.gift_id,
+          gift_name: checkoutData.gift_name,
           payer: {
             email: checkoutData.guest_email,
             first_name: firstName,

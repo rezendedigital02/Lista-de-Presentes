@@ -8,12 +8,13 @@ const cardPaymentSchema = z.object({
   installments: z.number().min(1).default(1),
   transaction_amount: z.number().min(1),
   description: z.string(),
+  gift_id: z.string().optional(),
+  gift_name: z.string().optional(),
   payer_email: z.string().email(),
   payer_name: z.string().optional(),
   identification_type: z.string().default("CPF"),
   identification_number: z.string().min(11),
   external_reference: z.string(),
-  device_id: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -49,6 +50,7 @@ export async function POST(request: NextRequest) {
           payment_method_id: data.payment_method_id,
           issuer_id: data.issuer_id || undefined,
           binary_mode: true,
+          notification_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://lista-de-presentes-sigma.vercel.app"}/api/webhooks/mercadopago`,
           payer: {
             email: data.payer_email,
             first_name: data.payer_name?.split(" ")[0] || "Cliente",
@@ -61,8 +63,10 @@ export async function POST(request: NextRequest) {
           additional_info: {
             items: [
               {
-                id: "gift",
-                title: data.description,
+                id: data.gift_id || "gift-item",
+                title: data.gift_name || data.description,
+                description: `Presente de casamento: ${data.gift_name || data.description}`,
+                category_id: "others",
                 quantity: 1,
                 unit_price: data.transaction_amount,
               },
@@ -70,6 +74,7 @@ export async function POST(request: NextRequest) {
             payer: {
               first_name: data.payer_name?.split(" ")[0] || "Cliente",
               last_name: data.payer_name?.split(" ").slice(1).join(" ") || "Lista Presentes",
+              registration_date: new Date().toISOString(),
             },
           },
           external_reference: data.external_reference,

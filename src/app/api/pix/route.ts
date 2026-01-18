@@ -3,7 +3,7 @@ import { z } from "zod";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
 const pixSchema = z.object({
-  transaction_amount: z.number().min(10),
+  transaction_amount: z.number().min(1),
   payer: z.object({
     email: z.string().email(),
     first_name: z.string().min(1),
@@ -14,6 +14,8 @@ const pixSchema = z.object({
     }),
   }),
   description: z.string(),
+  gift_id: z.string().optional(),
+  gift_name: z.string().optional(),
   external_reference: z.string(),
 });
 
@@ -43,11 +45,29 @@ export async function POST(request: NextRequest) {
       transaction_amount: validatedData.transaction_amount,
       description: validatedData.description,
       payment_method_id: "pix",
+      notification_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://lista-de-presentes-sigma.vercel.app"}/api/webhooks/mercadopago`,
       payer: {
         email: validatedData.payer.email,
         first_name: validatedData.payer.first_name,
         last_name: validatedData.payer.last_name,
         identification: validatedData.payer.identification,
+      },
+      additional_info: {
+        items: [
+          {
+            id: validatedData.gift_id || "gift-item",
+            title: validatedData.gift_name || validatedData.description,
+            description: `Presente de casamento: ${validatedData.gift_name || validatedData.description}`,
+            category_id: "others",
+            quantity: 1,
+            unit_price: validatedData.transaction_amount,
+          },
+        ],
+        payer: {
+          first_name: validatedData.payer.first_name,
+          last_name: validatedData.payer.last_name,
+          registration_date: new Date().toISOString(),
+        },
       },
       external_reference: validatedData.external_reference,
     };
