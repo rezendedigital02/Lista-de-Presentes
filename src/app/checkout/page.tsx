@@ -19,13 +19,6 @@ import { Button, Card, CardContent } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
 import { initMercadoPago, CardPayment } from "@mercadopago/sdk-react";
 
-// Initialize MercadoPago SDK
-if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
-  initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY, {
-    locale: "pt-BR",
-  });
-}
-
 interface CheckoutData {
   gift_id: string;
   gift_name: string;
@@ -56,6 +49,17 @@ export default function CheckoutPage() {
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [cpf, setCpf] = useState("");
   const [cardBrickReady, setCardBrickReady] = useState(false);
+  const [sdkReady, setSdkReady] = useState(false);
+
+  // Initialize MercadoPago SDK on client side
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
+      initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY, {
+        locale: "pt-BR",
+      });
+      setSdkReady(true);
+    }
+  }, []);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("checkoutData");
@@ -539,37 +543,39 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    {/* CardPayment Brick */}
-                    {!cardBrickReady && (
+                    {/* CardPayment Brick - Only render when SDK is ready */}
+                    {(!sdkReady || !cardBrickReady) && (
                       <div className="flex items-center justify-center py-8">
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
                         <span className="ml-2 text-text-muted">Carregando formulário...</span>
                       </div>
                     )}
 
-                    <div className={cardBrickReady ? "" : "opacity-0 h-0 overflow-hidden"}>
-                      <CardPayment
-                        initialization={{
-                          amount: checkoutData.amount,
-                          payer: {
-                            email: checkoutData.guest_email,
-                          },
-                        }}
-                        customization={{
-                          visual: {
-                            style: {
-                              theme: "default",
+                    {sdkReady && checkoutData && (
+                      <div className={cardBrickReady ? "" : "opacity-0 h-0 overflow-hidden"}>
+                        <CardPayment
+                          initialization={{
+                            amount: checkoutData.amount,
+                            payer: {
+                              email: checkoutData.guest_email,
                             },
-                          },
-                          paymentMethods: {
-                            maxInstallments: 12,
-                          },
-                        }}
-                        onSubmit={handleCardPaymentSubmit}
-                        onReady={handleCardPaymentReady}
-                        onError={handleCardPaymentError}
-                      />
-                    </div>
+                          }}
+                          customization={{
+                            visual: {
+                              style: {
+                                theme: "default",
+                              },
+                            },
+                            paymentMethods: {
+                              maxInstallments: 12,
+                            },
+                          }}
+                          onSubmit={handleCardPaymentSubmit}
+                          onReady={handleCardPaymentReady}
+                          onError={handleCardPaymentError}
+                        />
+                      </div>
+                    )}
 
                     {isProcessing && (
                       <div className="flex items-center justify-center py-4 mt-4">
