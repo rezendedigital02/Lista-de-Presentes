@@ -60,14 +60,18 @@ export default function CheckoutPage() {
   const [addressState, setAddressState] = useState("");
   const [addressLoading, setAddressLoading] = useState(false);
 
-  // Initialize MercadoPago SDK on client side
+  // Initialize MercadoPago SDK on client side (only once)
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
+    // Check if SDK is already initialized to avoid duplicate warning
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!(window as any).__mercadoPagoInitialized && process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
       initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY, {
         locale: "pt-BR",
       });
-      setSdkReady(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).__mercadoPagoInitialized = true;
     }
+    setSdkReady(true);
   }, []);
 
   useEffect(() => {
