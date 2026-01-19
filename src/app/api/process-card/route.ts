@@ -36,8 +36,13 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Get client IP for anti-fraud
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const clientIp = forwardedFor ? forwardedFor.split(",")[0].trim() : request.headers.get("x-real-ip") || "unknown";
+
     console.log(`Processing payment with token: ${data.token.substring(0, 10)}...`);
     console.log(`Payment method: ${data.payment_method_id}`);
+    console.log(`Client IP: ${clientIp}`);
 
     // Create payment using the token from the SDK
     const paymentResponse = await fetch(
@@ -56,7 +61,7 @@ export async function POST(request: NextRequest) {
           installments: data.installments,
           payment_method_id: data.payment_method_id,
           issuer_id: data.issuer_id || undefined,
-          binary_mode: true,
+          // binary_mode removed to allow "in_process" status which has better approval rates
           notification_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://lista-de-presentes-sigma.vercel.app"}/api/webhooks/mercadopago`,
           payer: {
             email: data.payer_email,
@@ -105,6 +110,8 @@ export async function POST(request: NextRequest) {
                 state_name: data.address_federal_unit || "",
               },
             } : undefined,
+            // IP address for anti-fraud validation
+            ip_address: clientIp !== "unknown" ? clientIp : undefined,
           },
           external_reference: data.external_reference,
           statement_descriptor: "CASAMENTO P&E",
