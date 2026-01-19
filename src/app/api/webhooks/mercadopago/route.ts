@@ -57,6 +57,12 @@ export async function POST(request: NextRequest) {
 
     if (existingContribution) {
       // Update existing contribution
+      const { data: oldContribution } = await supabaseAdmin
+        .from("contributions")
+        .select("payment_status, amount, gift_id")
+        .eq("id", existingContribution.id)
+        .single();
+
       await supabaseAdmin
         .from("contributions")
         .update({
@@ -64,6 +70,29 @@ export async function POST(request: NextRequest) {
           updated_at: new Date().toISOString(),
         })
         .eq("id", existingContribution.id);
+
+      // If status changed to approved, update gift amount_received
+      if (status === "approved" && oldContribution?.payment_status !== "approved" && oldContribution?.gift_id) {
+        const { data: gift } = await supabaseAdmin
+          .from("gifts")
+          .select("amount_received, price")
+          .eq("id", oldContribution.gift_id)
+          .single();
+
+        if (gift) {
+          const newAmount = (gift.amount_received || 0) + (oldContribution.amount || 0);
+          const isFullyFunded = newAmount >= gift.price;
+
+          await supabaseAdmin
+            .from("gifts")
+            .update({
+              amount_received: newAmount,
+              is_available: !isFullyFunded,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", oldContribution.gift_id);
+        }
+      }
     } else {
       // Create new contribution
       await supabaseAdmin.from("contributions").insert({
@@ -81,17 +110,20 @@ export async function POST(request: NextRequest) {
       if (status === "approved" && gift_id) {
         const { data: gift } = await supabaseAdmin
           .from("gifts")
-          .select("amount_received")
+          .select("amount_received, price")
           .eq("id", gift_id)
           .single();
 
         if (gift) {
           const newAmount =
             (gift.amount_received || 0) + (paymentDetails.transaction_amount || 0);
+          const isFullyFunded = newAmount >= gift.price;
+
           await supabaseAdmin
             .from("gifts")
             .update({
               amount_received: newAmount,
+              is_available: !isFullyFunded,
               updated_at: new Date().toISOString(),
             })
             .eq("id", gift_id);
