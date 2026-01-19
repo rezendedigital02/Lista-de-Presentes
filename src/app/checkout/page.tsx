@@ -109,6 +109,16 @@ export default function CheckoutPage() {
     if (!mpInstance || !checkoutData || paymentMethod !== "credit_card") return;
     if (cardFormRef.current) return; // Already initialized
 
+    // Style for iframe fields
+    const iframeStyle = {
+      height: "100%",
+      width: "100%",
+      "font-size": "16px",
+      "font-family": "Inter, sans-serif",
+      color: "#333",
+      "padding-left": "12px",
+    };
+
     try {
       const cardForm = mpInstance.cardForm({
         amount: String(checkoutData.amount),
@@ -118,14 +128,17 @@ export default function CheckoutPage() {
           cardNumber: {
             id: "form-checkout__cardNumber",
             placeholder: "Número do cartão",
+            style: iframeStyle,
           },
           expirationDate: {
             id: "form-checkout__expirationDate",
             placeholder: "MM/YY",
+            style: iframeStyle,
           },
           securityCode: {
             id: "form-checkout__securityCode",
             placeholder: "CVV",
+            style: iframeStyle,
           },
           cardholderName: {
             id: "form-checkout__cardholderName",
@@ -146,9 +159,19 @@ export default function CheckoutPage() {
           onFormMounted: (err: Error | null) => {
             if (err) {
               console.error("CardForm mount error:", err);
+              setError("Erro ao carregar formulário de cartão. Recarregue a página.");
             } else {
+              console.log("CardForm mounted successfully");
               setSecureFieldsReady(true);
             }
+          },
+          onReady: () => {
+            console.log("CardForm ready");
+            setSecureFieldsReady(true);
+          },
+          onError: (err: Error) => {
+            console.error("CardForm error:", err);
+            setError("Erro no formulário de cartão: " + (err?.message || "Verifique os dados"));
           },
           onSubmit: async (event: Event) => {
             event.preventDefault();
