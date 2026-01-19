@@ -15,6 +15,13 @@ const cardPaymentSchema = z.object({
   identification_type: z.string().default("CPF"),
   identification_number: z.string().min(11),
   external_reference: z.string(),
+  // Address fields (optional but recommended for better approval)
+  address_zip_code: z.string().optional(),
+  address_street_name: z.string().optional(),
+  address_street_number: z.string().optional(),
+  address_neighborhood: z.string().optional(),
+  address_city: z.string().optional(),
+  address_federal_unit: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -59,6 +66,14 @@ export async function POST(request: NextRequest) {
               type: data.identification_type,
               number: data.identification_number.replace(/\D/g, ""),
             },
+            address: data.address_zip_code ? {
+              zip_code: data.address_zip_code.replace(/\D/g, ""),
+              street_name: data.address_street_name || "",
+              street_number: data.address_street_number || "",
+              neighborhood: data.address_neighborhood || "",
+              city: data.address_city || "",
+              federal_unit: data.address_federal_unit || "",
+            } : undefined,
           },
           additional_info: {
             items: [
@@ -75,7 +90,21 @@ export async function POST(request: NextRequest) {
               first_name: data.payer_name?.split(" ")[0] || "Cliente",
               last_name: data.payer_name?.split(" ").slice(1).join(" ") || "Lista Presentes",
               registration_date: new Date().toISOString(),
+              address: data.address_zip_code ? {
+                zip_code: data.address_zip_code.replace(/\D/g, ""),
+                street_name: data.address_street_name || "",
+                street_number: data.address_street_number || "",
+              } : undefined,
             },
+            shipments: data.address_zip_code ? {
+              receiver_address: {
+                zip_code: data.address_zip_code.replace(/\D/g, ""),
+                street_name: data.address_street_name || "",
+                street_number: data.address_street_number || "",
+                city_name: data.address_city || "",
+                state_name: data.address_federal_unit || "",
+              },
+            } : undefined,
           },
           external_reference: data.external_reference,
           statement_descriptor: "CASAMENTO P&E",

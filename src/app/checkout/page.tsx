@@ -51,6 +51,15 @@ export default function CheckoutPage() {
   const [cardBrickReady, setCardBrickReady] = useState(false);
   const [sdkReady, setSdkReady] = useState(false);
 
+  // Address state for card payments
+  const [addressZipCode, setAddressZipCode] = useState("");
+  const [addressStreet, setAddressStreet] = useState("");
+  const [addressNumber, setAddressNumber] = useState("");
+  const [addressNeighborhood, setAddressNeighborhood] = useState("");
+  const [addressCity, setAddressCity] = useState("");
+  const [addressState, setAddressState] = useState("");
+  const [addressLoading, setAddressLoading] = useState(false);
+
   // Initialize MercadoPago SDK on client side
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
@@ -101,6 +110,34 @@ export default function CheckoutPage() {
       .replace(/(\d{3})(\d)/, "$1.$2")
       .replace(/(\d{3})(\d{1,2})/, "$1-$2")
       .replace(/(-\d{2})\d+?$/, "$1");
+  };
+
+  const formatCEP = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    return numbers.replace(/(\d{5})(\d)/, "$1-$2").substring(0, 9);
+  };
+
+  // Fetch address from CEP using ViaCEP API
+  const fetchAddressFromCEP = async (cep: string) => {
+    const cleanCep = cep.replace(/\D/g, "");
+    if (cleanCep.length !== 8) return;
+
+    setAddressLoading(true);
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
+      const data = await response.json();
+
+      if (!data.erro) {
+        setAddressStreet(data.logradouro || "");
+        setAddressNeighborhood(data.bairro || "");
+        setAddressCity(data.localidade || "");
+        setAddressState(data.uf || "");
+      }
+    } catch (err) {
+      console.error("Error fetching CEP:", err);
+    } finally {
+      setAddressLoading(false);
+    }
   };
 
   const handlePixPayment = async () => {
@@ -216,6 +253,13 @@ export default function CheckoutPage() {
           payer_name: checkoutData.guest_name,
           identification_type: formData.payer?.identification?.type || "CPF",
           identification_number: formData.payer?.identification?.number || "",
+          // Address fields from our form
+          address_zip_code: addressZipCode.replace(/\D/g, ""),
+          address_street_name: addressStreet,
+          address_street_number: addressNumber,
+          address_neighborhood: addressNeighborhood,
+          address_city: addressCity,
+          address_federal_unit: addressState,
           external_reference: JSON.stringify({
             gift_id: checkoutData.gift_id,
             guest_name: checkoutData.guest_name,
@@ -540,6 +584,104 @@ export default function CheckoutPage() {
                         <p className="text-xs md:text-sm text-text-muted">
                           Parcele em até 12x
                         </p>
+                      </div>
+                    </div>
+
+                    {/* Address Form - Required for card payments */}
+                    <div className="space-y-4 mb-6 pb-6 border-b border-gray-200">
+                      <p className="text-sm font-medium text-text-muted">Endereço de cobrança</p>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          CEP <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={addressZipCode}
+                            onChange={(e) => {
+                              const formatted = formatCEP(e.target.value);
+                              setAddressZipCode(formatted);
+                              if (formatted.replace(/\D/g, "").length === 8) {
+                                fetchAddressFromCEP(formatted);
+                              }
+                            }}
+                            placeholder="00000-000"
+                            maxLength={9}
+                            className="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                          />
+                          {addressLoading && (
+                            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-primary" />
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="col-span-2">
+                          <label className="block text-sm font-medium mb-2">
+                            Rua <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={addressStreet}
+                            onChange={(e) => setAddressStreet(e.target.value)}
+                            placeholder="Nome da rua"
+                            className="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Nº <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={addressNumber}
+                            onChange={(e) => setAddressNumber(e.target.value)}
+                            placeholder="123"
+                            className="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Bairro <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={addressNeighborhood}
+                          onChange={(e) => setAddressNeighborhood(e.target.value)}
+                          placeholder="Nome do bairro"
+                          className="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="col-span-2">
+                          <label className="block text-sm font-medium mb-2">
+                            Cidade <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={addressCity}
+                            onChange={(e) => setAddressCity(e.target.value)}
+                            placeholder="Nome da cidade"
+                            className="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            UF <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={addressState}
+                            onChange={(e) => setAddressState(e.target.value.toUpperCase())}
+                            placeholder="SP"
+                            maxLength={2}
+                            className="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm uppercase"
+                          />
+                        </div>
                       </div>
                     </div>
 
