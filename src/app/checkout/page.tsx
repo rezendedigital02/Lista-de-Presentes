@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
@@ -17,12 +17,13 @@ import {
 import Link from "next/link";
 import { Button, Card, CardContent } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
+import { initMercadoPago, CardPayment } from "@mercadopago/sdk-react";
 
-declare global {
-  interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    MercadoPago: any;
-  }
+// Initialize MercadoPago SDK
+if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
+  initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY, {
+    locale: "pt-BR",
+  });
 }
 
 interface CheckoutData {
@@ -43,6 +44,7 @@ interface PixData {
   payment_id: number;
 }
 
+
 export default function CheckoutPage() {
   const router = useRouter();
   const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
@@ -53,21 +55,7 @@ export default function CheckoutPage() {
   const [copied, setCopied] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [cpf, setCpf] = useState("");
-  const [mpReady, setMpReady] = useState(false);
-  const [secureFieldsReady, setSecureFieldsReady] = useState(false);
-
-  // Card form state (non-sensitive fields only)
-  const [cardholderName, setCardholderName] = useState("");
-  const [cardDocument, setCardDocument] = useState("");
-  const [installments, setInstallments] = useState(1);
-  const [, setPaymentMethodId] = useState("");
-  const [, setIssuerId] = useState("");
-  const [, setAvailableInstallments] = useState<Array<{installments: number; recommended_message: string}>>([]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mpInstance, setMpInstance] = useState<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cardFormRef = useRef<any>(null);
+  const [cardBrickReady, setCardBrickReady] = useState(false);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("checkoutData");
@@ -77,226 +65,6 @@ export default function CheckoutPage() {
       router.push("/presentes");
     }
   }, [router]);
-
-  // Initialize MercadoPago SDK
-  useEffect(() => {
-    const initMP = () => {
-      if (window.MercadoPago && process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
-        const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY, {
-          locale: "pt-BR",
-        });
-        setMpInstance(mp);
-        setMpReady(true);
-      }
-    };
-
-    if (window.MercadoPago) {
-      initMP();
-    } else {
-      const checkInterval = setInterval(() => {
-        if (window.MercadoPago) {
-          initMP();
-          clearInterval(checkInterval);
-        }
-      }, 100);
-
-      return () => clearInterval(checkInterval);
-    }
-  }, []);
-
-  // Initialize Secure Fields when switching to credit card
-  const initSecureFields = useCallback(() => {
-    if (!mpInstance || !checkoutData || paymentMethod !== "credit_card") return;
-    if (cardFormRef.current) return; // Already initialized
-
-    // Style for iframe fields
-    const iframeStyle = {
-      height: "100%",
-      width: "100%",
-      "font-size": "16px",
-      "font-family": "Inter, sans-serif",
-      color: "#333",
-      "padding-left": "12px",
-    };
-
-    try {
-      const cardForm = mpInstance.cardForm({
-        amount: String(checkoutData.amount),
-        iframe: true,
-        form: {
-          id: "form-checkout",
-          cardNumber: {
-            id: "form-checkout__cardNumber",
-            placeholder: "Número do cartão",
-            style: iframeStyle,
-          },
-          expirationDate: {
-            id: "form-checkout__expirationDate",
-            placeholder: "MM/YY",
-            style: iframeStyle,
-          },
-          securityCode: {
-            id: "form-checkout__securityCode",
-            placeholder: "CVV",
-            style: iframeStyle,
-          },
-          cardholderName: {
-            id: "form-checkout__cardholderName",
-            placeholder: "Nome como no cartão",
-          },
-          identificationType: {
-            id: "form-checkout__identificationType",
-          },
-          identificationNumber: {
-            id: "form-checkout__identificationNumber",
-            placeholder: "CPF",
-          },
-          installments: {
-            id: "form-checkout__installments",
-          },
-        },
-        callbacks: {
-          onFormMounted: (err: Error | null) => {
-            if (err) {
-              console.error("CardForm mount error:", err);
-              setError("Erro ao carregar formulário de cartão. Recarregue a página.");
-            } else {
-              console.log("CardForm mounted successfully");
-              setSecureFieldsReady(true);
-            }
-          },
-          onReady: () => {
-            console.log("CardForm ready");
-            setSecureFieldsReady(true);
-          },
-          onError: (err: Error) => {
-            console.error("CardForm error:", err);
-            setError("Erro no formulário de cartão: " + (err?.message || "Verifique os dados"));
-          },
-          onSubmit: async (event: Event) => {
-            event.preventDefault();
-
-            if (isProcessing) return;
-            setIsProcessing(true);
-            setError(null);
-
-            try {
-              const formData = cardFormRef.current?.getCardFormData();
-
-              if (!formData?.token) {
-                throw new Error("Não foi possível processar o cartão. Verifique os dados.");
-              }
-
-              const response = await fetch("/api/process-card", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  token: formData.token,
-                  payment_method_id: formData.paymentMethodId,
-                  issuer_id: formData.issuerId,
-                  installments: Number(formData.installments),
-                  transaction_amount: checkoutData.amount,
-                  description: `Presente: ${checkoutData.gift_name}`,
-                  gift_id: checkoutData.gift_id,
-                  gift_name: checkoutData.gift_name,
-                  payer_email: checkoutData.guest_email,
-                  payer_name: formData.cardholderName,
-                  identification_type: formData.identificationType,
-                  identification_number: formData.identificationNumber,
-                  external_reference: JSON.stringify({
-                    gift_id: checkoutData.gift_id,
-                    guest_name: checkoutData.guest_name,
-                    guest_email: checkoutData.guest_email,
-                    message: checkoutData.message || "",
-                  }),
-                }),
-              });
-
-              const data = await response.json();
-
-              if (!response.ok) {
-                throw new Error(data.error || "Erro ao processar pagamento");
-              }
-
-              if (data.success && (data.status === "approved" || data.status === "authorized")) {
-                toast.success("Pagamento aprovado!");
-                sessionStorage.removeItem("checkoutData");
-                router.push("/confirmacao?status=approved");
-              } else if (data.success && (data.status === "in_process" || data.status === "pending")) {
-                toast.success("Pagamento em análise");
-                sessionStorage.removeItem("checkoutData");
-                router.push("/confirmacao?status=pending");
-              } else {
-                throw new Error(data.error || "Pagamento não aprovado.");
-              }
-            } catch (err) {
-              console.error("Card payment error:", err);
-              const message = err instanceof Error ? err.message : "Erro ao processar pagamento";
-              setError(message);
-              toast.error(message);
-            } finally {
-              setIsProcessing(false);
-            }
-          },
-          onFetching: (resource: string) => {
-            console.log("Fetching:", resource);
-            return () => {};
-          },
-          onCardTokenReceived: (errorData: unknown, token: string) => {
-            if (errorData) {
-              console.error("Token error:", errorData);
-            } else {
-              console.log("Token received:", token?.substring(0, 10) + "...");
-            }
-          },
-          onInstallmentsReceived: (errorData: unknown, installmentOptions: Array<{installments: number; recommended_message: string}>) => {
-            if (!errorData && installmentOptions) {
-              setAvailableInstallments(installmentOptions);
-            }
-          },
-          onPaymentMethodsReceived: (errorData: unknown, paymentMethods: Array<{id: string}>) => {
-            if (!errorData && paymentMethods && paymentMethods.length > 0) {
-              setPaymentMethodId(paymentMethods[0].id);
-            }
-          },
-          onIssuersReceived: (errorData: unknown, issuers: Array<{id: string}>) => {
-            if (!errorData && issuers && issuers.length > 0) {
-              setIssuerId(issuers[0].id);
-            }
-          },
-        },
-      });
-
-      cardFormRef.current = cardForm;
-    } catch (err) {
-      console.error("Error initializing card form:", err);
-    }
-  }, [mpInstance, checkoutData, paymentMethod, isProcessing, router]);
-
-  // Initialize secure fields when payment method changes to credit card
-  useEffect(() => {
-    if (paymentMethod === "credit_card" && mpReady && checkoutData) {
-      // Small delay to ensure DOM is ready
-      const timeout = setTimeout(() => {
-        initSecureFields();
-      }, 100);
-      return () => clearTimeout(timeout);
-    }
-  }, [paymentMethod, mpReady, checkoutData, initSecureFields]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (cardFormRef.current) {
-        try {
-          cardFormRef.current.unmount();
-        } catch {
-          // Ignore unmount errors
-        }
-        cardFormRef.current = null;
-      }
-    };
-  }, []);
 
   // Poll payment status for PIX
   useEffect(() => {
@@ -417,6 +185,78 @@ export default function CheckoutPage() {
     } catch {
       toast.error("Erro ao copiar código");
     }
+  };
+
+  // Handle CardPayment Brick submission
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCardPaymentSubmit = async (formData: any) => {
+    if (!checkoutData) return;
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/process-card", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: formData.token,
+          payment_method_id: formData.payment_method_id,
+          issuer_id: formData.issuer_id,
+          installments: formData.installments,
+          transaction_amount: checkoutData.amount,
+          description: `Presente: ${checkoutData.gift_name}`,
+          gift_id: checkoutData.gift_id,
+          gift_name: checkoutData.gift_name,
+          payer_email: formData.payer?.email || checkoutData.guest_email,
+          payer_name: checkoutData.guest_name,
+          identification_type: formData.payer?.identification?.type || "CPF",
+          identification_number: formData.payer?.identification?.number || "",
+          external_reference: JSON.stringify({
+            gift_id: checkoutData.gift_id,
+            guest_name: checkoutData.guest_name,
+            guest_email: checkoutData.guest_email,
+            message: checkoutData.message || "",
+          }),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erro ao processar pagamento");
+      }
+
+      if (data.success && (data.status === "approved" || data.status === "authorized")) {
+        toast.success("Pagamento aprovado!");
+        sessionStorage.removeItem("checkoutData");
+        router.push("/confirmacao?status=approved");
+      } else if (data.success && (data.status === "in_process" || data.status === "pending")) {
+        toast.success("Pagamento em análise");
+        sessionStorage.removeItem("checkoutData");
+        router.push("/confirmacao?status=pending");
+      } else {
+        throw new Error(data.error || "Pagamento não aprovado.");
+      }
+    } catch (err) {
+      console.error("Card payment error:", err);
+      const message = err instanceof Error ? err.message : "Erro ao processar pagamento";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCardPaymentError = (err: any) => {
+    console.error("CardPayment Brick error:", err);
+    setError("Erro no formulário de cartão. Verifique os dados.");
+  };
+
+  const handleCardPaymentReady = () => {
+    console.log("CardPayment Brick ready");
+    setCardBrickReady(true);
   };
 
   if (!checkoutData) {
@@ -547,15 +387,6 @@ export default function CheckoutPage() {
                     setPaymentMethod("credit_card");
                     setPixData(null);
                     setError(null);
-                    setSecureFieldsReady(false);
-                    if (cardFormRef.current) {
-                      try {
-                        cardFormRef.current.unmount();
-                      } catch {
-                        // Ignore
-                      }
-                      cardFormRef.current = null;
-                    }
                   }}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-3 md:px-4 rounded-lg border-2 transition-all text-sm md:text-base ${
                     paymentMethod === "credit_card"
@@ -692,7 +523,7 @@ export default function CheckoutPage() {
                 </Card>
               )}
 
-              {/* Credit Card Payment with Secure Fields */}
+              {/* Credit Card Payment with Bricks */}
               {paymentMethod === "credit_card" && (
                 <Card>
                   <CardContent className="p-4 md:p-6">
@@ -708,113 +539,43 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    {!mpReady ? (
+                    {/* CardPayment Brick */}
+                    {!cardBrickReady && (
                       <div className="flex items-center justify-center py-8">
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                        <span className="ml-2 text-text-muted">Carregando...</span>
+                        <span className="ml-2 text-text-muted">Carregando formulário...</span>
                       </div>
-                    ) : (
-                      <form id="form-checkout" className="space-y-4">
-                        {/* Card Number - Secure Field */}
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Número do cartão <span className="text-red-500">*</span>
-                          </label>
-                          <div
-                            id="form-checkout__cardNumber"
-                            className="w-full h-12 px-3 rounded-lg border border-gray-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
-                          ></div>
-                        </div>
+                    )}
 
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Expiration Date - Secure Field */}
-                          <div>
-                            <label className="block text-sm font-medium mb-2">
-                              Validade <span className="text-red-500">*</span>
-                            </label>
-                            <div
-                              id="form-checkout__expirationDate"
-                              className="w-full h-12 px-3 rounded-lg border border-gray-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
-                            ></div>
-                          </div>
+                    <div className={cardBrickReady ? "" : "opacity-0 h-0 overflow-hidden"}>
+                      <CardPayment
+                        initialization={{
+                          amount: checkoutData.amount,
+                          payer: {
+                            email: checkoutData.guest_email,
+                          },
+                        }}
+                        customization={{
+                          visual: {
+                            style: {
+                              theme: "default",
+                            },
+                          },
+                          paymentMethods: {
+                            maxInstallments: 12,
+                          },
+                        }}
+                        onSubmit={handleCardPaymentSubmit}
+                        onReady={handleCardPaymentReady}
+                        onError={handleCardPaymentError}
+                      />
+                    </div>
 
-                          {/* Security Code - Secure Field */}
-                          <div>
-                            <label className="block text-sm font-medium mb-2">
-                              CVV <span className="text-red-500">*</span>
-                            </label>
-                            <div
-                              id="form-checkout__securityCode"
-                              className="w-full h-12 px-3 rounded-lg border border-gray-300 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
-                            ></div>
-                          </div>
-                        </div>
-
-                        {/* Cardholder Name */}
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Nome no cartão <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            id="form-checkout__cardholderName"
-                            type="text"
-                            value={cardholderName}
-                            onChange={(e) => setCardholderName(e.target.value.toUpperCase())}
-                            placeholder="NOME COMO NO CARTÃO"
-                            className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base uppercase"
-                          />
-                        </div>
-
-                        {/* Identification Type (hidden) */}
-                        <select
-                          id="form-checkout__identificationType"
-                          className="hidden"
-                          defaultValue="CPF"
-                        >
-                          <option value="CPF">CPF</option>
-                        </select>
-
-                        {/* Identification Number */}
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            CPF <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            id="form-checkout__identificationNumber"
-                            type="text"
-                            value={cardDocument}
-                            onChange={(e) => setCardDocument(formatCPF(e.target.value))}
-                            placeholder="000.000.000-00"
-                            maxLength={14}
-                            className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base"
-                          />
-                        </div>
-
-                        {/* Installments */}
-                        <div>
-                          <label className="block text-sm font-medium mb-2">
-                            Parcelas
-                          </label>
-                          <select
-                            id="form-checkout__installments"
-                            value={installments}
-                            onChange={(e) => setInstallments(Number(e.target.value))}
-                            className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm md:text-base bg-white"
-                          >
-                            <option value="1">1x de {formatCurrency(checkoutData.amount)}</option>
-                          </select>
-                        </div>
-
-                        <Button
-                          type="submit"
-                          isLoading={isProcessing}
-                          size="lg"
-                          className="w-full"
-                          disabled={!secureFieldsReady}
-                        >
-                          {isProcessing ? "Processando..." : `Pagar ${formatCurrency(checkoutData.amount)}`}
-                        </Button>
-                      </form>
+                    {isProcessing && (
+                      <div className="flex items-center justify-center py-4 mt-4">
+                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                        <span className="ml-2 text-text-muted">Processando pagamento...</span>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
