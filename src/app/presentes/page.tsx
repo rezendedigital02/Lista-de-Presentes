@@ -1,10 +1,40 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { GiftGrid } from "@/components/sections";
 import { initialGifts } from "@/lib/gifts-data";
+import type { Gift } from "@/types";
 
 export default function GiftsPage() {
+  const [gifts, setGifts] = useState<Gift[]>(initialGifts);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGifts() {
+      try {
+        const response = await fetch("/api/presentes");
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          setGifts(data.data);
+        } else {
+          // Fallback to initial gifts if API fails
+          setGifts(initialGifts);
+        }
+      } catch (error) {
+        console.error("Error fetching gifts:", error);
+        // Fallback to initial gifts
+        setGifts(initialGifts);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchGifts();
+  }, []);
+
   return (
     <>
       {/* Page Header */}
@@ -27,7 +57,13 @@ export default function GiftsPage() {
       {/* Gifts Grid */}
       <section className="section">
         <div className="container mx-auto px-4">
-          <GiftGrid gifts={initialGifts} />
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <GiftGrid gifts={gifts} />
+          )}
         </div>
       </section>
     </>

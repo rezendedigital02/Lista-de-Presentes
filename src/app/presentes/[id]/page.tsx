@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -13,28 +13,72 @@ import {
   Minus,
   Plus,
   ShoppingCart,
+  Loader2,
 } from "lucide-react";
 import { Button, Input, Textarea, Badge, ProgressBar, Card, CardContent } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
 import { categoryLabels } from "@/types";
 import { initialGifts } from "@/lib/gifts-data";
+import type { Gift as GiftType } from "@/types";
 
 export default function GiftDetailPage() {
   const params = useParams();
   const router = useRouter();
   const giftId = params.id as string;
 
-  // Find the gift
-  const gift = useMemo(() => {
-    return initialGifts.find((g) => g.id === giftId);
-  }, [giftId]);
-
-  const [amount, setAmount] = useState(gift ? Math.min(gift.price - gift.amount_received, 100) : 100);
+  const [gift, setGift] = useState<GiftType | null>(null);
+  const [isLoadingGift, setIsLoadingGift] = useState(true);
+  const [amount, setAmount] = useState(100);
   const [isCustomAmount, setIsCustomAmount] = useState(false);
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch gift from API
+  useEffect(() => {
+    async function fetchGift() {
+      try {
+        const response = await fetch(`/api/presentes/${giftId}`);
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          setGift(data.data);
+          const remaining = Math.max(data.data.price - data.data.amount_received, 0);
+          setAmount(Math.min(remaining, 100));
+        } else {
+          // Fallback to initial gifts
+          const fallbackGift = initialGifts.find((g) => g.id === giftId);
+          if (fallbackGift) {
+            setGift(fallbackGift);
+            const remaining = Math.max(fallbackGift.price - fallbackGift.amount_received, 0);
+            setAmount(Math.min(remaining, 100));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching gift:", error);
+        // Fallback to initial gifts
+        const fallbackGift = initialGifts.find((g) => g.id === giftId);
+        if (fallbackGift) {
+          setGift(fallbackGift);
+          const remaining = Math.max(fallbackGift.price - fallbackGift.amount_received, 0);
+          setAmount(Math.min(remaining, 100));
+        }
+      } finally {
+        setIsLoadingGift(false);
+      }
+    }
+
+    fetchGift();
+  }, [giftId]);
+
+  if (isLoadingGift) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!gift) {
     return (
