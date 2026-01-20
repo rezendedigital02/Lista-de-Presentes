@@ -63,14 +63,29 @@ export default function CheckoutPage() {
 
   // Initialize MercadoPago SDK on client side (only once)
   useEffect(() => {
+    const publicKey = process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY;
+
+    if (!publicKey) {
+      console.error("NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY not configured");
+      setError("Erro de configuração do pagamento. Contate o suporte.");
+      return;
+    }
+
     // Check if SDK is already initialized to avoid duplicate warning
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!(window as any).__mercadoPagoInitialized && process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY) {
-      initMercadoPago(process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY, {
-        locale: "pt-BR",
-      });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).__mercadoPagoInitialized = true;
+    if (!(window as any).__mercadoPagoInitialized) {
+      try {
+        initMercadoPago(publicKey, {
+          locale: "pt-BR",
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (window as any).__mercadoPagoInitialized = true;
+        console.log("MercadoPago SDK initialized successfully");
+      } catch (err) {
+        console.error("Error initializing MercadoPago SDK:", err);
+        setError("Erro ao inicializar pagamento. Recarregue a página.");
+        return;
+      }
     }
     setSdkReady(true);
   }, []);
