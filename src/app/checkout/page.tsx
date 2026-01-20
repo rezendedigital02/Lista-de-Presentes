@@ -279,6 +279,16 @@ export default function CheckoutPage() {
         throw new Error(data.error || "Erro ao processar pagamento");
       }
 
+      // Check if 3DS challenge is required
+      if (data.requires_3ds && data.three_ds_info?.external_resource_url) {
+        toast.success("Redirecionando para autenticação do banco...");
+        // Store payment ID for verification after 3DS
+        sessionStorage.setItem("pending_payment_id", data.id.toString());
+        // Redirect to 3DS challenge
+        window.location.href = data.three_ds_info.external_resource_url;
+        return;
+      }
+
       if (data.success && (data.status === "approved" || data.status === "authorized")) {
         toast.success("Pagamento aprovado!");
         sessionStorage.removeItem("checkoutData");

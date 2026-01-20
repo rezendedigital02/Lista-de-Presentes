@@ -115,6 +115,8 @@ export async function POST(request: NextRequest) {
           },
           external_reference: data.external_reference,
           statement_descriptor: "CASAMENTO P&E",
+          // Enable 3D Secure for better approval rates on high-risk transactions
+          three_d_secure_mode: "optional",
         }),
       }
     );
@@ -176,6 +178,19 @@ export async function POST(request: NextRequest) {
         status: payment.status,
         status_detail: statusDetail,
       }, { status: 400 });
+    }
+
+    // Check if 3DS challenge is required
+    if (payment.three_ds_info?.external_resource_url) {
+      console.log("3DS Challenge required:", payment.three_ds_info);
+      return NextResponse.json({
+        success: true,
+        id: payment.id,
+        status: payment.status,
+        status_detail: payment.status_detail,
+        three_ds_info: payment.three_ds_info,
+        requires_3ds: true,
+      });
     }
 
     return NextResponse.json({
