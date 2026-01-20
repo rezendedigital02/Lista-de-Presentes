@@ -51,7 +51,7 @@ export default function CheckoutPage() {
   const [cardBrickReady, setCardBrickReady] = useState(false);
   const [sdkReady, setSdkReady] = useState(false);
 
-  // Address state for card payments
+  // Address and phone state for card payments
   const [addressZipCode, setAddressZipCode] = useState("");
   const [addressStreet, setAddressStreet] = useState("");
   const [addressNumber, setAddressNumber] = useState("");
@@ -59,6 +59,7 @@ export default function CheckoutPage() {
   const [addressCity, setAddressCity] = useState("");
   const [addressState, setAddressState] = useState("");
   const [addressLoading, setAddressLoading] = useState(false);
+  const [payerPhone, setPayerPhone] = useState("");
 
   // Initialize MercadoPago SDK on client side (only once)
   useEffect(() => {
@@ -119,6 +120,13 @@ export default function CheckoutPage() {
   const formatCEP = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     return numbers.replace(/(\d{5})(\d)/, "$1-$2").substring(0, 9);
+  };
+
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, "");
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
   };
 
   // Fetch address from CEP using ViaCEP API
@@ -264,6 +272,8 @@ export default function CheckoutPage() {
           address_neighborhood: addressNeighborhood,
           address_city: addressCity,
           address_federal_unit: addressState,
+          // Phone for better approval rates
+          payer_phone: payerPhone.replace(/\D/g, ""),
           external_reference: JSON.stringify({
             gift_id: checkoutData.gift_id,
             guest_name: checkoutData.guest_name,
@@ -696,6 +706,20 @@ export default function CheckoutPage() {
                             className="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm uppercase"
                           />
                         </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Telefone <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={payerPhone}
+                          onChange={(e) => setPayerPhone(formatPhone(e.target.value))}
+                          placeholder="(11) 99999-9999"
+                          maxLength={15}
+                          className="w-full px-3 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm"
+                        />
                       </div>
                     </div>
 

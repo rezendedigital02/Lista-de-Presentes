@@ -22,6 +22,8 @@ const cardPaymentSchema = z.object({
   address_neighborhood: z.string().optional(),
   address_city: z.string().optional(),
   address_federal_unit: z.string().optional(),
+  // Phone (optional but helps with approval)
+  payer_phone: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -71,6 +73,10 @@ export async function POST(request: NextRequest) {
               type: data.identification_type,
               number: data.identification_number.replace(/\D/g, ""),
             },
+            phone: data.payer_phone ? {
+              area_code: data.payer_phone.replace(/\D/g, "").substring(0, 2),
+              number: data.payer_phone.replace(/\D/g, "").substring(2),
+            } : undefined,
             address: data.address_zip_code ? {
               zip_code: data.address_zip_code.replace(/\D/g, ""),
               street_name: data.address_street_name || "",
@@ -95,6 +101,10 @@ export async function POST(request: NextRequest) {
               first_name: data.payer_name?.split(" ")[0] || "Cliente",
               last_name: data.payer_name?.split(" ").slice(1).join(" ") || "Lista Presentes",
               registration_date: new Date().toISOString(),
+              phone: data.payer_phone ? {
+                area_code: data.payer_phone.replace(/\D/g, "").substring(0, 2),
+                number: data.payer_phone.replace(/\D/g, "").substring(2),
+              } : undefined,
               address: data.address_zip_code ? {
                 zip_code: data.address_zip_code.replace(/\D/g, ""),
                 street_name: data.address_street_name || "",
@@ -117,6 +127,8 @@ export async function POST(request: NextRequest) {
           statement_descriptor: "CASAMENTO P&E",
           // Enable 3D Secure for better approval rates on high-risk transactions
           three_d_secure_mode: "optional",
+          // Callback URL for 3DS redirect
+          callback_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://lista-de-presentes-sigma.vercel.app"}/confirmacao`,
         }),
       }
     );
