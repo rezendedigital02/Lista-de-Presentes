@@ -15,6 +15,15 @@ const cardPaymentSchema = z.object({
   identification_type: z.string().default("CPF"),
   identification_number: z.string().min(11),
   external_reference: z.string(),
+  // Address fields (optional but recommended for better approval)
+  address_zip_code: z.string().optional(),
+  address_street_name: z.string().optional(),
+  address_street_number: z.string().optional(),
+  address_neighborhood: z.string().optional(),
+  address_city: z.string().optional(),
+  address_federal_unit: z.string().optional(),
+  // Phone (optional but helps with approval)
+  payer_phone: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -29,8 +38,13 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // Get client IP for anti-fraud
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const clientIp = forwardedFor ? forwardedFor.split(",")[0].trim() : request.headers.get("x-real-ip") || "unknown";
+
     console.log(`Processing payment with token: ${data.token.substring(0, 10)}...`);
     console.log(`Payment method: ${data.payment_method_id}`);
+    console.log(`Client IP: ${clientIp}`);
 
     // Create payment using the token from the SDK
     const paymentResponse = await fetch(
@@ -49,7 +63,7 @@ export async function POST(request: NextRequest) {
           installments: data.installments,
           payment_method_id: data.payment_method_id,
           issuer_id: data.issuer_id || undefined,
-          binary_mode: true,
+          // binary_mode removed to allow "in_process" status which has better approval rates
           notification_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://lista-de-presentes-sigma.vercel.app"}/api/webhooks/mercadopago`,
           payer: {
             email: data.payer_email,
@@ -59,6 +73,18 @@ export async function POST(request: NextRequest) {
               type: data.identification_type,
               number: data.identification_number.replace(/\D/g, ""),
             },
+            phone: data.payer_phone ? {
+              area_code: data.payer_phone.replace(/\D/g, "").substring(0, 2),
+              number: data.payer_phone.replace(/\D/g, "").substring(2),
+            } : undefined,
+            address: data.address_zip_code ? {
+              zip_code: data.address_zip_code.replace(/\D/g, ""),
+              street_name: data.address_street_name || "",
+              street_number: data.address_street_number || "",
+              neighborhood: data.address_neighborhood || "",
+              city: data.address_city || "",
+              federal_unit: data.address_federal_unit || "",
+            } : undefined,
           },
           additional_info: {
             items: [
@@ -75,10 +101,34 @@ export async function POST(request: NextRequest) {
               first_name: data.payer_name?.split(" ")[0] || "Cliente",
               last_name: data.payer_name?.split(" ").slice(1).join(" ") || "Lista Presentes",
               registration_date: new Date().toISOString(),
+              phone: data.payer_phone ? {
+                area_code: data.payer_phone.replace(/\D/g, "").substring(0, 2),
+                number: data.payer_phone.replace(/\D/g, "").substring(2),
+              } : undefined,
+              address: data.address_zip_code ? {
+                zip_code: data.address_zip_code.replace(/\D/g, ""),
+                street_name: data.address_street_name || "",
+                street_number: data.address_street_number || "",
+              } : undefined,
             },
+            shipments: data.address_zip_code ? {
+              receiver_address: {
+                zip_code: data.address_zip_code.replace(/\D/g, ""),
+                street_name: data.address_street_name || "",
+                street_number: data.address_street_number || "",
+                city_name: data.address_city || "",
+                state_name: data.address_federal_unit || "",
+              },
+            } : undefined,
+            // IP address for anti-fraud validation
+            ip_address: clientIp !== "unknown" ? clientIp : undefined,
           },
           external_reference: data.external_reference,
           statement_descriptor: "CASAMENTO P&E",
+          // Enable 3D Secure for better approval rates on high-risk transactions
+          three_d_secure_mode: "optional",
+          // Callback URL for 3DS redirect
+          callback_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://lista-de-presentes-sigma.vercel.app"}/confirmacao`,
         }),
       }
     );
@@ -140,6 +190,19 @@ export async function POST(request: NextRequest) {
         status: payment.status,
         status_detail: statusDetail,
       }, { status: 400 });
+    }
+
+    // Check if 3DS challenge is required
+    if (payment.three_ds_info?.external_resource_url) {
+      console.log("3DS Challenge required:", payment.three_ds_info);
+      return NextResponse.json({
+        success: true,
+        id: payment.id,
+        status: payment.status,
+        status_detail: payment.status_detail,
+        three_ds_info: payment.three_ds_info,
+        requires_3ds: true,
+      });
     }
 
     return NextResponse.json({

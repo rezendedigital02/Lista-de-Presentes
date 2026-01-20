@@ -96,4 +96,21 @@
   .glass {
     @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
+
+  /* MercadoPago Secure Fields iframe containers */
+  #form-checkout__cardNumber,
+  #form-checkout__expirationDate,
+  #form-checkout__securityCode {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+  }
+
+  #form-checkout__cardNumber iframe,
+  #form-checkout__expirationDate iframe,
+  #form-checkout__securityCode iframe {
+    height: 48px !important;
+    width: 100% !important;
+    border: none !important;
+  }
 }
