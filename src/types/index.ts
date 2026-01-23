@@ -5,7 +5,8 @@ export type Category =
   | "sala"
   | "banheiro"
   | "eletrodomesticos"
-  | "experiencias";
+  | "experiencias"
+  | "zoeira";
 
 export const categoryLabels: Record<Category, string> = {
   cozinha: "Cozinha",
@@ -14,6 +15,7 @@ export const categoryLabels: Record<Category, string> = {
   banheiro: "Banheiro",
   eletrodomesticos: "Eletrodomésticos",
   experiencias: "Experiências",
+  zoeira: "Zoeira",
 };
 
 export const categoryIcons: Record<Category, string> = {
@@ -23,6 +25,7 @@ export const categoryIcons: Record<Category, string> = {
   banheiro: "🛁",
   eletrodomesticos: "📺",
   experiencias: "✨",
+  zoeira: "🎉",
 };
 
 // Presente
@@ -37,6 +40,7 @@ export interface Gift {
   amount_received: number;
   created_at: string;
   updated_at?: string;
+  is_joke?: boolean; // Produtos de zoeira - nunca ficam completos
 }
 
 // Status do pagamento

@@ -580,4 +580,58 @@ export const initialGifts: Gift[] = [
     created_at: new Date().toISOString(),
   },
 
+  // Zoeira - Produtos de diversão que nunca ficam completos
+  {
+    id: "50",
+    name: "Só para dizer que não dei nada",
+    description:
+      "Para aquele amigo que quer participar mas não quer ficar de fora da lista de presentes! 😅",
+    price: 49.90,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/istockphoto-594481556-612x612%20(1).jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vaXN0b2NrcGhvdG8tNTk0NDgxNTU2LTYxMng2MTIgKDEpLmpwZyIsImlhdCI6MTc2OTE5OTUwMSwiZXhwIjoxODAwNzM1NTAxfQ.pLXKP4b6zLTDGIaqT4UVAF5qJB1mPv9a2exOg_pWK30",
+    category: "zoeira" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+    is_joke: true,
+  },
+  {
+    id: "51",
+    name: "Tampão de ouvido para a noiva dormir bem com os roncos do noivo",
+    description:
+      "Essencial para garantir noites tranquilas! O Emanuel ronca que é uma beleza! 😴",
+    price: 59.90,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/Tampao.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vVGFtcGFvLmpwZyIsImlhdCI6MTc2OTE5OTYzOCwiZXhwIjoxODAwNzM1NjM4fQ.jHUj_9qjk6igyRimsCj3j3GPb2gWafKC5--6n2su93c",
+    category: "zoeira" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+    is_joke: true,
+  },
+  {
+    id: "52",
+    name: "01 ano de estoque de papel higiênico para a noiva",
+    description:
+      "Porque a Priscila merece o melhor conforto! Presente prático e indispensável! 🧻",
+    price: 199.90,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/papel%20higienico.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vcGFwZWwgaGlnaWVuaWNvLmpwZyIsImlhdCI6MTc2OTE5OTcxNCwiZXhwIjoxODAwNzM1NzE0fQ.o5mOnajW48fA3yPnd9I-XDwK9vg68Liqqwt604ouk60",
+    category: "zoeira" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+    is_joke: true,
+  },
+  {
+    id: "53",
+    name: "Tô duro, mas quero ajudar",
+    description:
+      "Para quem está apertado mas quer deixar seu carinho! Cada real conta! 💪❤️",
+    price: 30.00,
+    image_url: "https://dthfhdsjkwlzgvxctyaq.supabase.co/storage/v1/object/sign/Casamento/sem%20grana.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYzcwY2NlMy05ZjQ5LTRlZDItYTNkOC1iMTZmZjYyM2NlMDgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJDYXNhbWVudG8vc2VtIGdyYW5hLmpwZyIsImlhdCI6MTc2OTE5OTc4MSwiZXhwIjoxODAwNzM1NzgxfQ.ow2wCZK2lLELia9jD7zP6Xa-mepHFzHrO7pzY5oW59A",
+    category: "zoeira" as Category,
+    is_available: true,
+    amount_received: 0,
+    created_at: new Date().toISOString(),
+    is_joke: true,
+  },
+
 ];
