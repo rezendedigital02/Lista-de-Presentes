@@ -14,6 +14,7 @@ import {
   Plus,
   ShoppingCart,
   Loader2,
+  PartyPopper,
 } from "lucide-react";
 import { Button, Input, Textarea, Badge, ProgressBar, Card, CardContent } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
@@ -44,15 +45,25 @@ export default function GiftDetailPage() {
 
         if (data.success && data.data) {
           setGift(data.data);
-          const remaining = Math.max(data.data.price - data.data.amount_received, 0);
-          setAmount(Math.min(remaining, 100));
+          // Produtos de zoeira: valor fixo (preço cheio)
+          if (data.data.is_joke) {
+            setAmount(data.data.price);
+          } else {
+            const remaining = Math.max(data.data.price - data.data.amount_received, 0);
+            setAmount(Math.min(remaining, 100));
+          }
         } else {
           // Fallback to initial gifts
           const fallbackGift = initialGifts.find((g) => g.id === giftId);
           if (fallbackGift) {
             setGift(fallbackGift);
-            const remaining = Math.max(fallbackGift.price - fallbackGift.amount_received, 0);
-            setAmount(Math.min(remaining, 100));
+            // Produtos de zoeira: valor fixo (preço cheio)
+            if (fallbackGift.is_joke) {
+              setAmount(fallbackGift.price);
+            } else {
+              const remaining = Math.max(fallbackGift.price - fallbackGift.amount_received, 0);
+              setAmount(Math.min(remaining, 100));
+            }
           }
         }
       } catch (error) {
@@ -61,8 +72,13 @@ export default function GiftDetailPage() {
         const fallbackGift = initialGifts.find((g) => g.id === giftId);
         if (fallbackGift) {
           setGift(fallbackGift);
-          const remaining = Math.max(fallbackGift.price - fallbackGift.amount_received, 0);
-          setAmount(Math.min(remaining, 100));
+          // Produtos de zoeira: valor fixo (preço cheio)
+          if (fallbackGift.is_joke) {
+            setAmount(fallbackGift.price);
+          } else {
+            const remaining = Math.max(fallbackGift.price - fallbackGift.amount_received, 0);
+            setAmount(Math.min(remaining, 100));
+          }
         }
       } finally {
         setIsLoadingGift(false);
@@ -95,11 +111,13 @@ export default function GiftDetailPage() {
     );
   }
 
-  const isFullyFunded = gift.amount_received >= gift.price;
+  // Produtos de zoeira nunca ficam completos
+  const isJoke = gift.is_joke === true;
+  const isFullyFunded = !isJoke && gift.amount_received >= gift.price;
   const remaining = Math.max(gift.price - gift.amount_received, 0);
-  const maxAmount = remaining;
+  const maxAmount = isJoke ? gift.price : remaining;
 
-  const suggestedAmounts = [50, 100, 200, 500].filter((a) => a <= maxAmount);
+  const suggestedAmounts = isJoke ? [] : [50, 100, 200, 500].filter((a) => a <= maxAmount);
 
   const handleAmountChange = (value: number) => {
     setAmount(Math.min(Math.max(value, 10), maxAmount));
@@ -191,11 +209,11 @@ export default function GiftDetailPage() {
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-4 left-4">
-                  <Badge className="bg-white/90 backdrop-blur-sm">
-                    {categoryLabels[gift.category]}
+                  <Badge className={isJoke ? "bg-purple-500 text-white" : "bg-white/90 backdrop-blur-sm"}>
+                    {isJoke ? "🎉 Zoeira" : categoryLabels[gift.category]}
                   </Badge>
                 </div>
-                {isFullyFunded && (
+                {isFullyFunded && !isJoke && (
                   <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                     <div className="bg-green-500 text-white px-6 py-3 rounded-full flex items-center gap-2">
                       <Check className="w-6 h-6" />
@@ -224,13 +242,24 @@ export default function GiftDetailPage() {
               <Card>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-text-muted">Valor total:</span>
+                    <span className="text-text-muted">{isJoke ? "Valor:" : "Valor total:"}</span>
                     <span className="text-2xl font-bold text-primary">
                       {formatCurrency(gift.price)}
                     </span>
                   </div>
 
-                  {gift.amount_received > 0 && (
+                  {/* Mensagem especial para produtos de zoeira */}
+                  {isJoke && (
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-center">
+                      <PartyPopper className="w-5 h-5 text-purple-600 mx-auto mb-1" />
+                      <p className="text-sm text-purple-700">
+                        Este é um presente de <strong>zoeira</strong>! Valor fixo, sem cota mínima.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Progresso - Não mostra para produtos de zoeira */}
+                  {!isJoke && gift.amount_received > 0 && (
                     <>
                       <ProgressBar
                         value={gift.amount_received}
@@ -254,66 +283,68 @@ export default function GiftDetailPage() {
               {/* Contribution Form */}
               {!isFullyFunded && (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Amount Selection */}
-                  <div className="space-y-3">
-                    <label className="block text-sm font-medium text-text">
-                      Valor da contribuição
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {suggestedAmounts.map((suggested) => (
-                        <Button
-                          key={suggested}
-                          type="button"
-                          variant={amount === suggested && !isCustomAmount ? "primary" : "outline"}
-                          size="sm"
-                          onClick={() => handleAmountChange(suggested)}
-                        >
-                          {formatCurrency(suggested)}
-                        </Button>
-                      ))}
-                      <Button
-                        type="button"
-                        variant={amount === maxAmount && !isCustomAmount ? "primary" : "outline"}
-                        size="sm"
-                        onClick={() => handleAmountChange(maxAmount)}
-                      >
-                        Valor restante ({formatCurrency(maxAmount)})
-                      </Button>
-                    </div>
-
-                    {/* Custom Amount */}
-                    <div className="flex items-center gap-3">
-                      <span className="text-text-muted">ou</span>
-                      <div className="flex-1 flex items-center gap-2">
+                  {/* Amount Selection - Só mostra para produtos normais (não zoeira) */}
+                  {!isJoke && (
+                    <div className="space-y-3">
+                      <label className="block text-sm font-medium text-text">
+                        Valor da contribuição
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {suggestedAmounts.map((suggested) => (
+                          <Button
+                            key={suggested}
+                            type="button"
+                            variant={amount === suggested && !isCustomAmount ? "primary" : "outline"}
+                            size="sm"
+                            onClick={() => handleAmountChange(suggested)}
+                          >
+                            {formatCurrency(suggested)}
+                          </Button>
+                        ))}
                         <Button
                           type="button"
-                          variant="outline"
+                          variant={amount === maxAmount && !isCustomAmount ? "primary" : "outline"}
                           size="sm"
-                          onClick={() => handleAmountChange(amount - 10)}
-                          disabled={amount <= 10}
+                          onClick={() => handleAmountChange(maxAmount)}
                         >
-                          <Minus className="w-4 h-4" />
-                        </Button>
-                        <div className="flex-1">
-                          <Input
-                            type="number"
-                            value={amount}
-                            onChange={(e) => handleCustomAmount(e.target.value)}
-                            className="text-center font-semibold"
-                          />
-                        </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleAmountChange(amount + 10)}
-                          disabled={amount >= maxAmount}
-                        >
-                          <Plus className="w-4 h-4" />
+                          Valor restante ({formatCurrency(maxAmount)})
                         </Button>
                       </div>
+
+                      {/* Custom Amount */}
+                      <div className="flex items-center gap-3">
+                        <span className="text-text-muted">ou</span>
+                        <div className="flex-1 flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAmountChange(amount - 10)}
+                            disabled={amount <= 10}
+                          >
+                            <Minus className="w-4 h-4" />
+                          </Button>
+                          <div className="flex-1">
+                            <Input
+                              type="number"
+                              value={amount}
+                              onChange={(e) => handleCustomAmount(e.target.value)}
+                              className="text-center font-semibold"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleAmountChange(amount + 10)}
+                            disabled={amount >= maxAmount}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Guest Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -336,8 +367,8 @@ export default function GiftDetailPage() {
 
                   {/* Message */}
                   <Textarea
-                    label="Mensagem para os noivos (opcional)"
-                    placeholder="Deixe uma mensagem carinhosa para os noivos..."
+                    label={isJoke ? "Deixe uma mensagem engraçada (opcional)" : "Mensagem para os noivos (opcional)"}
+                    placeholder={isJoke ? "Manda aquela zoeira..." : "Deixe uma mensagem carinhosa para os noivos..."}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     rows={3}
@@ -347,11 +378,11 @@ export default function GiftDetailPage() {
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full"
+                    className={`w-full ${isJoke ? "bg-purple-600 hover:bg-purple-700" : ""}`}
                     isLoading={isLoading}
-                    leftIcon={<ShoppingCart className="w-5 h-5" />}
+                    leftIcon={isJoke ? <PartyPopper className="w-5 h-5" /> : <ShoppingCart className="w-5 h-5" />}
                   >
-                    Contribuir {formatCurrency(amount)}
+                    {isJoke ? `Participar da Zoeira ${formatCurrency(amount)}` : `Contribuir ${formatCurrency(amount)}`}
                   </Button>
 
                   <p className="text-sm text-text-muted text-center flex items-center justify-center gap-2">

@@ -37,7 +37,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <script src="https://sdk.mercadopago.com/js/v2" async></script>
+        {/* MercadoPago SDK is loaded by @mercadopago/sdk-react - no manual script needed */}
       </head>
       <body className="font-sans bg-background text-text antialiased">
         <Header />

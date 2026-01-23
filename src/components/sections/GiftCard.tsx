@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Gift as GiftIcon, Check } from "lucide-react";
+import { Gift as GiftIcon, Check, PartyPopper } from "lucide-react";
 import { Card, Badge, ProgressBar, Button } from "@/components/ui";
 import { formatCurrency } from "@/lib/utils";
 import { categoryLabels, type Gift } from "@/types";
@@ -13,7 +13,9 @@ interface GiftCardProps {
 }
 
 export function GiftCard({ gift, index = 0 }: GiftCardProps) {
-  const isFullyFunded = gift.amount_received >= gift.price;
+  // Produtos de zoeira nunca ficam completos
+  const isJoke = gift.is_joke === true;
+  const isFullyFunded = !isJoke && gift.amount_received >= gift.price;
   const remaining = Math.max(gift.price - gift.amount_received, 0);
 
   return (
@@ -33,13 +35,16 @@ export function GiftCard({ gift, index = 0 }: GiftCardProps) {
 
           {/* Category Badge */}
           <div className="absolute top-3 left-3">
-            <Badge variant="default" className="bg-white/90 backdrop-blur-sm">
-              {categoryLabels[gift.category]}
+            <Badge
+              variant="default"
+              className={isJoke ? "bg-purple-500 text-white" : "bg-white/90 backdrop-blur-sm"}
+            >
+              {isJoke ? "🎉 Zoeira" : categoryLabels[gift.category]}
             </Badge>
           </div>
 
-          {/* Fully Funded Badge */}
-          {isFullyFunded && (
+          {/* Fully Funded Badge - Nunca mostra para produtos de zoeira */}
+          {isFullyFunded && !isJoke && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <motion.div
                 initial={{ scale: 0 }}
@@ -68,15 +73,16 @@ export function GiftCard({ gift, index = 0 }: GiftCardProps) {
               <span className="text-lg sm:text-xl font-bold text-primary">
                 {formatCurrency(gift.price)}
               </span>
-              {gift.amount_received > 0 && !isFullyFunded && (
+              {/* Não mostra "Faltam X" para produtos de zoeira */}
+              {!isJoke && gift.amount_received > 0 && !isFullyFunded && (
                 <span className="text-xs sm:text-sm text-text-muted">
                   Faltam {formatCurrency(remaining)}
                 </span>
               )}
             </div>
 
-            {/* Progress Bar */}
-            {gift.amount_received > 0 && (
+            {/* Progress Bar - Não mostra para produtos de zoeira */}
+            {!isJoke && gift.amount_received > 0 && (
               <ProgressBar
                 value={gift.amount_received}
                 max={gift.price}
@@ -88,12 +94,12 @@ export function GiftCard({ gift, index = 0 }: GiftCardProps) {
             {/* Action Button */}
             <Link href={`/presentes/${gift.id}`} className="block">
               <Button
-                variant={isFullyFunded ? "ghost" : "primary"}
-                className="w-full text-sm sm:text-base"
+                variant={isFullyFunded ? "ghost" : isJoke ? "primary" : "primary"}
+                className={`w-full text-sm sm:text-base ${isJoke ? "bg-purple-600 hover:bg-purple-700" : ""}`}
                 disabled={isFullyFunded}
-                leftIcon={<GiftIcon className="w-4 h-4" />}
+                leftIcon={isJoke ? <PartyPopper className="w-4 h-4" /> : <GiftIcon className="w-4 h-4" />}
               >
-                {isFullyFunded ? "Já Presenteado" : "Presentear"}
+                {isFullyFunded ? "Já Presenteado" : isJoke ? "Participar da Zoeira" : "Presentear"}
               </Button>
             </Link>
           </div>
